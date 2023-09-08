@@ -1,15 +1,46 @@
 version: '3.1'
 services:
-  stats-server:
+  stats-client:
+    image: stats-client
+    build: ./stat_client
+    container_name: stat-client
+    ports:
+      - "8080:8080"
+    depends_on:
+      - stats-dto
+    environment:
+      - STATS_DTO_URL=http://stats-dto:9090
+
+  stats-dto:
+    image: stats-dto
+    build: ./stat_dto
+    container_name: stat-dto
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-server
+    environment:
+      - STATS_SERVER_URL=http://stats-server:9091
+
+  stats-server:
+    image: stats-server
+    build: ./stat_service
+    container_name: stat-server
+    ports:
+      - "9091:9091"
+    depends_on:
+      - stats-db
+    environment:
+      - URL_DB=postgresql://stats-db:5432/explore
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
   stats-db:
     image: postgres:14-alpine
-
-  ewm-service:
+    container_name: postgres
     ports:
-      - "8080:8080"
-
-  ewm-db:
-    image: postgres:14-alpine
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=explore
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
