@@ -1,45 +1,51 @@
 version: '3.1'
 services:
-  stats-client:
-    image: stats-client
-    build: ./stat_client
-    container_name: stat-client
+  ewm-main-server:
+    image: ewm-main-server
+    build: ewm-main-server/.
+    container_name: ewm-main-server
     ports:
-      - "8080:8080"
+      - "${MAIN_PORT}:${MAIN_PORT}"
     depends_on:
-      - stats-dto
+      - ewm-stat-server
+      - ewm-db
     environment:
-      - STATS_DTO_URL=http://stats-dto:9090
+      - MAIN_PORT=${MAIN_PORT}
+      - MAIN_DB_PORT=5432
+      - URL_DB=postgresql://ewm-db:5432/explore
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
-  stats-dto:
-    image: stats-dto
-    build: ./stat_dto
-    container_name: stat-dto
+  ewm-stat-server:
+    image: ewm-stat-server
+    build: ewm-stat-server/stat_service/.
+    container_name: ewm-stat-server
     ports:
-      - "9090:9090"
-    depends_on:
-      - stats-server
-    environment:
-      - STATS_SERVER_URL=http://stats-server:9091
-
-  stats-server:
-    image: stats-server
-    build: ./stat_service
-    container_name: stat-server
-    ports:
-      - "9091:9091"
+      - "${STAT_PORT}:${STAT_PORT}"
     depends_on:
       - stats-db
     environment:
-      - URL_DB=postgresql://stats-db:5432/explore
+      - STAT_PORT=${STAT_PORT}
+      - STAT_DB_PORT=5432
+      - STAT_URL_DB=postgresql://stats-db:5432/explore-stats
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
 
   stats-db:
     image: postgres:14-alpine
-    container_name: postgres
+    container_name: stats-db
     ports:
-      - "6541:5432"
+      - "${STAT_DB_PORT}:5432"
+    environment:
+      - POSTGRES_DB=explore-stats
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+
+  ewm-db:
+    image: postgres:14-alpine
+    container_name: ewm-db
+    ports:
+      - "${MAIN_DB_PORT}:5432"
     environment:
       - POSTGRES_DB=explore
       - POSTGRES_USER=root
