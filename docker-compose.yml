@@ -16,15 +16,40 @@ services:
       - STAT_DB_NAME=${STAT_DB_NAME}
       - STAT_DB_LOGIN=${STAT_DB_LOGIN}
       - STAT_DB_PASSWORD=${STAT_DB_PASSWORD}
-    restart: on-failure
 
   stats-db:
     container_name: stats-db
     image: postgres:14-alpine
-    command: "-c logging_collector=on -c log_statement=all"
     ports:
       - "6541:5432"
     environment:
       - POSTGRES_DB=${STAT_DB_NAME}
       - POSTGRES_USER=${STAT_DB_LOGIN}
       - POSTGRES_PASSWORD=${STAT_DB_PASSWORD}
+  ewm-db:
+    container_name: ewm-db
+    image: postgres:14-alpine
+    ports:
+      - "8467:5432"
+    environment:
+      - POSTGRES_DB=${MAIN_DB_NAME}
+      - POSTGRES_USER=${MAIN_DB_LOGIN}
+      - POSTGRES_PASSWORD=${MAIN_DB_PASSWORD}
+
+  ewm-service:
+    container_name: ewm-service
+    depends_on:
+      - stats-server
+      - ewm-db
+    ports:
+      - "8080:8080"
+    build: ewm-main-service/.
+    environment:
+      - MAIN_PORT=${MAIN_PORT}
+      - MAIN_DB_PORT=5432
+      - MAIN_DB_PATH=${MAIN_DB_PATH}
+      - MAIN_DB_NAME=${MAIN_DB_NAME}
+      - MAIN_DB_LOGIN=${MAIN_DB_LOGIN}
+      - MAIN_DB_PASSWORD=${MAIN_DB_PASSWORD}
+      - STAT_PORT=${STAT_PORT}
+      - STAT_PATH=${STAT_PATH}
