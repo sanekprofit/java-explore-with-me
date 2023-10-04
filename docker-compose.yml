@@ -19,7 +19,7 @@ services:
 
   stats-db:
     container_name: stats-db
-    image: postgres:14-alpine
+    image: postgres:latest
     ports:
       - "6541:5432"
     environment:
@@ -28,7 +28,7 @@ services:
       - POSTGRES_PASSWORD=${STAT_DB_PASSWORD}
   ewm-db:
     container_name: ewm-db
-    image: postgres:14-alpine
+    image: postgres:latest
     ports:
       - "8467:5432"
     environment:
