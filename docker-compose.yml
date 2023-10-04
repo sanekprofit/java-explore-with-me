@@ -1,52 +1,59 @@
-version: '3.1'
-services:
-  ewm-main-server:
-    image: ewm-main-server
-    build: ewm-main-server/.
-    container_name: ewm-main-server
-    ports:
-      - "${MAIN_PORT}:${MAIN_PORT}"
-    depends_on:
-      - ewm-stat-server
-      - ewm-db
-    environment:
-      - MAIN_PORT=${MAIN_PORT}
-      - MAIN_DB_PORT=5432
-      - URL_DB=postgresql://ewm-db:5432/explore
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+version: "3.1"
 
-  ewm-stat-server:
-    image: ewm-stat-server
-    build: ewm-stat-server/stat_service/.
-    container_name: ewm-stat-server
-    ports:
-      - "${STAT_PORT}:${STAT_PORT}"
+services:
+
+  stats-server:
+    container_name: stats-server
     depends_on:
       - stats-db
+    ports:
+      - "${STAT_PORT}:${STAT_PORT}"
+    build: ewm-stat-service/statistic-server/.
     environment:
       - STAT_PORT=${STAT_PORT}
       - STAT_DB_PORT=5432
-      - STAT_URL_DB=postgresql://stats-db:5432/explore-stats
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+      - STAT_DB_PATH=${STAT_DB_PATH}
+      - STAT_DB_NAME=${STAT_DB_NAME}
+      - STAT_DB_LOGIN=${STAT_DB_LOGIN}
+      - STAT_DB_PASSWORD=${STAT_DB_PASSWORD}
+    restart: on-failure
 
   stats-db:
-    image: postgres:14-alpine
     container_name: stats-db
+    image: postgres:14-alpine
+    command: "-c logging_collector=on -c log_statement=all"
     ports:
       - "${STAT_DB_PORT}:5432"
     environment:
-      - POSTGRES_DB=explore-stats
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=${STAT_DB_NAME}
+      - POSTGRES_USER=${STAT_DB_LOGIN}
+      - POSTGRES_PASSWORD=${STAT_DB_PASSWORD}
 
   ewm-db:
-    image: postgres:14-alpine
     container_name: ewm-db
+    image: postgres:14-alpine
     ports:
       - "${MAIN_DB_PORT}:5432"
     environment:
-      - POSTGRES_DB=explore
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=${MAIN_DB_NAME}
+      - POSTGRES_USER=${MAIN_DB_LOGIN}
+      - POSTGRES_PASSWORD=${MAIN_DB_PASSWORD}
+
+  ewm-service:
+    container_name: ewm-service
+    depends_on:
+      - stats-server
+      - ewm-db
+    ports:
+      - "${MAIN_PORT}:${MAIN_PORT}"
+    build: ewm-main-service/.
+    environment:
+      - MAIN_PORT=${MAIN_PORT}
+      - MAIN_DB_PORT=5432
+      - MAIN_DB_PATH=${MAIN_DB_PATH}
+      - MAIN_DB_NAME=${MAIN_DB_NAME}
+      - MAIN_DB_LOGIN=${MAIN_DB_LOGIN}
+      - MAIN_DB_PASSWORD=${MAIN_DB_PASSWORD}
+      - STAT_PORT=${STAT_PORT}
+      - STAT_PATH=${STAT_PATH}
+    restart: on-failure
