@@ -7,7 +7,7 @@ services:
     depends_on:
       - stats-db
     ports:
-      - "${STAT_PORT}:${STAT_PORT}"
+      - "9090:9090"
     build: ewm-stat-service/statistic-server/.
     environment:
       - STAT_PORT=${STAT_PORT}
@@ -23,7 +23,7 @@ services:
     image: postgres:14-alpine
     command: "-c logging_collector=on -c log_statement=all"
     ports:
-      - "${STAT_DB_PORT}:5432"
+      - "6541:5432"
     environment:
       - POSTGRES_DB=${STAT_DB_NAME}
       - POSTGRES_USER=${STAT_DB_LOGIN}
@@ -33,7 +33,7 @@ services:
     container_name: ewm-db
     image: postgres:14-alpine
     ports:
-      - "${MAIN_DB_PORT}:5432"
+      - "8153:5432"
     environment:
       - POSTGRES_DB=${MAIN_DB_NAME}
       - POSTGRES_USER=${MAIN_DB_LOGIN}
@@ -45,7 +45,7 @@ services:
       - stats-server
       - ewm-db
     ports:
-      - "${MAIN_PORT}:${MAIN_PORT}"
+      - "8080:8080"
     build: ewm-main-service/.
     environment:
       - MAIN_PORT=${MAIN_PORT}
