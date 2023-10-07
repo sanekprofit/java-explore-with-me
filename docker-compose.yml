@@ -10,10 +10,9 @@ services:
       - "9090:9090"
     build: ewm-stat-service/stat_service/.
     environment:
-      - STAT_DB_PATH=${STAT_DB_PATH}
-      - STAT_DB_NAME=${STAT_DB_NAME}
-      - STAT_DB_LOGIN=${STAT_DB_LOGIN}
-      - STAT_DB_PASSWORD=${STAT_DB_PASSWORD}
+      - STAT_URL_DB=postgresql://stats-db:5432/ewm-stat
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
   stats-db:
     container_name: stats-db
@@ -21,9 +20,9 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=${STAT_DB_NAME}
-      - POSTGRES_USER=${STAT_DB_LOGIN}
-      - POSTGRES_PASSWORD=${STAT_DB_PASSWORD}
+      - POSTGRES_DB=ewm-stat
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
   ewm-db:
     container_name: ewm-db
     image: postgres:14-alpine
