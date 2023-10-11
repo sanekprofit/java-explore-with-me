@@ -27,5 +27,5 @@ public class Stat {
 
     String ip;
 
-    LocalDateTime timestamp;
+    LocalDateTime timestamp = LocalDateTime.now();
 }
