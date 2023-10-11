@@ -29,9 +29,9 @@ services:
     ports:
       - "8467:5432"
     environment:
-      - POSTGRES_DB=${MAIN_DB_NAME}
-      - POSTGRES_USER=${MAIN_DB_LOGIN}
-      - POSTGRES_PASSWORD=${MAIN_DB_PASSWORD}
+      - POSTGRES_DB=ewm
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
   ewm-service:
     container_name: ewm-service
@@ -41,9 +41,6 @@ services:
       - "8080:8080"
     build: ewm-main-service/.
     environment:
-      - MAIN_DB_PATH=${MAIN_DB_PATH}
-      - MAIN_DB_NAME=${MAIN_DB_NAME}
-      - MAIN_DB_LOGIN=${MAIN_DB_LOGIN}
-      - MAIN_DB_PASSWORD=${MAIN_DB_PASSWORD}
-      - STAT_PORT=${STAT_PORT}
-      - STAT_PATH=${STAT_PATH}
+      - MAIN_URL_DB=postgresql://ewm-db:5432
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
