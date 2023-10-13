@@ -11,7 +11,7 @@ import ru.practicum.service.StatService;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/stats")
+@RequestMapping
 @Slf4j
 @RequiredArgsConstructor
 public class StatController {
@@ -24,7 +24,7 @@ public class StatController {
         return statService.saveRequest(stat);
     }
 
-    @GetMapping
+    @GetMapping("/stats")
     public Set<HitResponseDto> getStats(@RequestParam(name = "start") String start,
                                         @RequestParam(name = "end") String end,
                                         @RequestParam(name = "uris") String[] uris,
