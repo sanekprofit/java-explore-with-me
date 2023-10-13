@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>stat_service</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -29,6 +30,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <start-class>ru.practicum.EwmStat</start-class>
     </properties>
 
     <build>
