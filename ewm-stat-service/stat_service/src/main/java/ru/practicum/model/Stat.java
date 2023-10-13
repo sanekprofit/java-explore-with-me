@@ -27,5 +27,12 @@ public class Stat {
 
     String ip;
 
-    LocalDateTime timestamp = LocalDateTime.now();
+    LocalDateTime timestamp;
+
+    public Stat(String app, String uri, String ip, LocalDateTime timestamp) {
+        this.app = app;
+        this.uri = uri;
+        this.ip = ip;
+        this.timestamp = timestamp;
+    }
 }
