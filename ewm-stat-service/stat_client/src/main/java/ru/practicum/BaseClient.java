@@ -23,8 +23,8 @@ public class BaseClient {
 
     private final String serverUrl;
 
-    public BaseClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder, String serverUrl1) {
-        this.serverUrl = serverUrl1;
+    public BaseClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder) {
+        this.serverUrl = serverUrl;
         this.rest = builder
                 .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
