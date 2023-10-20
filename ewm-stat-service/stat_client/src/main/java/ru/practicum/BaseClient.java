@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -14,7 +15,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -22,6 +27,8 @@ public class BaseClient {
     private final RestTemplate rest;
 
     private final String serverUrl;
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public BaseClient(@Value("${stats-service.url}") String serverUrl, RestTemplateBuilder builder) {
         this.serverUrl = serverUrl;
@@ -32,67 +39,52 @@ public class BaseClient {
     }
 
     public void saveHit(HitDto hit) {
-        postHitRequest("/hit", hit);
+        postHitRequest(hit);
     }
 
-    public ResponseEntity<Object> getStats(LocalDateTime start,
-                         LocalDateTime end,
-                         String[] uris,
-                         Boolean unique) {
+    public List<HitResponseDto> getStats(LocalDateTime start,
+                                         LocalDateTime end,
+                                         List<String> uris,
+                                         Boolean unique) {
         Map<String, Object> param = Map.of(
-                "start", start,
-                "end", end,
-                "uris", uris,
+                "start", start.format(FORMATTER),
+                "end", end.format(FORMATTER),
                 "unique", unique
         );
-        return getStatsRequest("/stats", param);
+        return getStatsRequest(param, uris);
     }
 
-    private <T> ResponseEntity<Object> postHitRequest(String path, @Nullable T body) {
+    private <T> void postHitRequest(@Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, null);
 
         ResponseEntity<Object> statResponse;
 
         try {
-            statResponse = rest.exchange(path, HttpMethod.POST, requestEntity, Object.class);
+            statResponse = rest.exchange("/hit", HttpMethod.POST, requestEntity, Object.class);
         } catch (HttpStatusCodeException e) {
-            log.warn("Не удалось сохранить запрос.");
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            log.error("Не удалось сохранить запрос.");
         }
-
-        return prepareGatewayResponse(statResponse);
     }
 
-    private <T> ResponseEntity<Object> getStatsRequest(String path, @Nullable Map<String, Object> parameters) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(null, null);
-
-        ResponseEntity<Object> statResponse;
+    private <T> List<HitResponseDto> getStatsRequest(@Nullable Map<String, Object> parameters, List<String> uris) {
+        ResponseEntity<Object[]> statResponse;
 
         try {
             if (parameters != null) {
-                statResponse = rest.exchange(path, HttpMethod.GET, requestEntity, Object.class, parameters);
-            } else {
-                statResponse = rest.exchange(path, HttpMethod.GET, requestEntity, Object.class);
+                ObjectMapper objectMapper = new ObjectMapper();
+                String serverPath = serverUrl + "/stats?start={start}&end={end}&unique={unique}&"
+                        + uris.stream()
+                        .map(uri -> "uris=" + uri).collect(Collectors.joining("&"));
+                statResponse = rest.getForEntity(serverPath, Object[].class, parameters);
+                Object[] obj = statResponse.getBody();
+
+                return Arrays.stream(obj)
+                        .map(o -> objectMapper.convertValue(o, HitResponseDto.class))
+                        .collect(Collectors.toList());
             }
         } catch (HttpStatusCodeException e) {
-            log.warn("Не удалось получить статистику.");
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            log.error("Не удалось получить статистику.");
         }
-
-        return prepareGatewayResponse(statResponse);
-    }
-
-    private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response;
-        }
-
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
-        if (response.hasBody()) {
-            return responseBuilder.body(response.getBody());
-        }
-
-        return responseBuilder.build();
+        return List.of();
     }
 }

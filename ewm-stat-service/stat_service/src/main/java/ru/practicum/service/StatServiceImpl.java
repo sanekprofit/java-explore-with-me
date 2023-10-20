@@ -10,6 +10,7 @@ import ru.practicum.repository.StatRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public Set<HitResponseDto> getStats(String startStr, String endStr, String[] uris, Boolean unique) {
+    public List<HitResponseDto> getStats(String startStr, String endStr, List<String> uris, Boolean unique) {
 
         Set<HitResponseDto> viewStats = new HashSet<>();
 
@@ -41,7 +42,7 @@ public class StatServiceImpl implements StatService {
                 List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
 
                 if (stats.isEmpty()) {
-                    return viewStats;
+                    return new ArrayList<>(viewStats);
                 }
 
                 for (Stat stat : stats) {
@@ -54,7 +55,7 @@ public class StatServiceImpl implements StatService {
                 List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
 
                 if (stats.isEmpty()) {
-                    return viewStats;
+                    return new ArrayList<>(viewStats);
                 }
 
                 for (Stat stat : stats) {
@@ -70,7 +71,7 @@ public class StatServiceImpl implements StatService {
                     List<Stat> stats = repository.findAllByUriEqualsIgnoreCaseAndTimestampAfterAndTimestampBefore(uri, start, end);
 
                     if (stats.isEmpty()) {
-                        return viewStats;
+                        return new ArrayList<>(viewStats);
                     }
 
                     for (Stat stat : stats) {
@@ -84,7 +85,7 @@ public class StatServiceImpl implements StatService {
                     List<Stat> stats = repository.findAllByUriEqualsIgnoreCaseAndTimestampAfterAndTimestampBefore(uri, start, end);
 
                     if (stats.isEmpty()) {
-                        return viewStats;
+                        return new ArrayList<>(viewStats);
                     }
 
                     for (Stat stat : stats) {
@@ -97,6 +98,6 @@ public class StatServiceImpl implements StatService {
             }
         }
 
-        return viewStats;
+        return new ArrayList<>(viewStats);
     }
 }

@@ -9,7 +9,7 @@ import ru.practicum.HitResponseDto;
 import ru.practicum.model.Stat;
 import ru.practicum.service.StatService;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequestMapping
@@ -26,11 +26,11 @@ public class StatController {
     }
 
     @GetMapping("/stats")
-    public Set<HitResponseDto> getStats(@RequestParam(name = "start") String start,
+    public List<HitResponseDto> getStats(@RequestParam(name = "start") String start,
                                         @RequestParam(name = "end") String end,
-                                        @RequestParam(name = "uris", required = false) String[] uris,
+                                        @RequestParam(name = "uris", required = false) List<String> uris,
                                         @RequestParam(name = "unique", required = false, defaultValue = "false") Boolean unique) {
-        log.info(String.format("Получен запрос на получение статистики. start: [%s] end: [%s] unique: %b", start, end, unique));
+        log.info(String.format("Получен запрос на получение статистики. start: [%s] end: [%s] uris: {%s} unique: %b", start, end, uris, unique));
         return statService.getStats(start, end, uris, unique);
     }
 }

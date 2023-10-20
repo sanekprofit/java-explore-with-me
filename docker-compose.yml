@@ -42,6 +42,6 @@ services:
       - "8080:8080"
     build: ewm-main-service/.
     environment:
-      - MAIN_URL_DB=postgresql://ewm-db:5432
+      - MAIN_URL_DB=postgresql://ewm-db:5432/ewm
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
