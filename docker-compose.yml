@@ -43,5 +43,6 @@ services:
     build: ewm-main-service/.
     environment:
       - MAIN_URL_DB=postgresql://ewm-db:5432/ewm
+      - ewm.stat-service.url=http://stats-server:9090
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
