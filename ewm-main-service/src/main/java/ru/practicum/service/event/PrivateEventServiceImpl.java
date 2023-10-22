@@ -56,7 +56,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     public EventFullDto postEvent(Integer userId, NewEventDto eventDto) {
 
         if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictParamException("For the requested operation the event date are not met.");
+            throw new BadParamException("For the requested operation the event date are not met.");
         }
 
         if (eventDto.getCategory() < 1) {
@@ -130,7 +130,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     public EventFullDto patchEvent(Integer userId, Long eventId, UpdateEventUserRequest eventDto) {
 
         if (eventDto.getEventDate() != null && eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictParamException("For the requested operation the event date are not met.");
+            throw new BadParamException("For the requested operation the event date are not met.");
         }
 
         Optional<Event> eventOpt = repository.findById(eventId);
@@ -146,8 +146,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         patch(event, eventDto);
 
-        Category category = getCategoryById(eventDto.getCategory());
-        User initiator = getUserById(userId);
+        Category category = event.getCategory();
+        User initiator = event.getInitiator();
 
         CategoryDto categoryDto = CategoryMapper.toCategoryDto(category.getId(), category.getName());
         UserShortDto userShortDto = UserMapper.toUserShortDto(initiator.getId(), initiator.getName());
@@ -244,6 +244,9 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             participation.setStatus(ParticipantState.CONFIRMED);
+            participationRepository.save(participation);
+            return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
+                    participation.getId(), participation.getRequester().getId(), participation.getStatus());
         }
 
         if (getConfirmedRequests() >= event.getParticipantLimit()) {
@@ -317,7 +320,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             event.setLongitude(eventDto.getLocation().getLon());
         }
         event.setPaid(eventDto.isPaid());
-        event.setParticipantLimit(eventDto.getParticipantLimit());
+        if (eventDto.getParticipantLimit() != 0) event.setParticipantLimit(eventDto.getParticipantLimit());
         event.setRequestModeration(eventDto.isRequestModeration());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
         event.setState(EventState.CANCELED);

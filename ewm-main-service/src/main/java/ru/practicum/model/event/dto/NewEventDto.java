@@ -37,7 +37,7 @@ public class NewEventDto {
 
     int participantLimit;
 
-    boolean requestModeration;
+    boolean requestModeration = true;
 
     @NotNull
     @NotBlank

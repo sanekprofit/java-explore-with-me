@@ -78,7 +78,7 @@ public class EventStorage {
 
         List<Predicate> predicates = new LinkedList<>();
 
-        if (text != null && !text.isBlank()) {
+        if (text != null && !text.isBlank() && !text.equals("0")) {
             predicates.add(cb.or(
                     createSearchPredicate(cb, root, "title", text),
                     createSearchPredicate(cb, root, "annotation", text),

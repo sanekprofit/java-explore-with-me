@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.BaseClient;
+import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
+import ru.practicum.exceptions.BadParamException;
 import ru.practicum.exceptions.ConflictParamException;
 import ru.practicum.exceptions.NotFoundException;
 import ru.practicum.mapper.CategoryMapper;
@@ -47,8 +49,11 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size) {
+    public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size, String ip) {
         List<Event> events = storage.getAdminEventsSearch(users, states, categories, start, end, from, size);
+        for (Event event : events) {
+            statClient.saveHit(new HitDto("ewm-main-service", "events/" + event.getId(), ip, LocalDateTime.now()));
+        }
         return events.stream()
                 .map(event -> EventMapper.toEventFullDto(event,
                         CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
@@ -67,8 +72,8 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         Event event = eventOpt.get();
 
-        if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictParamException("For the requested operation the event date are not met.");
+        if (dto.getEventDate() != null && dto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new BadParamException("For the requested operation the event date are not met.");
         }
 
         patch(event, dto);
@@ -136,7 +141,7 @@ public class AdminEventServiceImpl implements AdminEventService {
             event.setLongitude(dto.getLocation().getLon());
         }
         event.setPaid(dto.isPaid());
-        event.setParticipantLimit(dto.getParticipantLimit());
+        if (dto.getParticipantLimit() != 0) event.setParticipantLimit(dto.getParticipantLimit());
         event.setRequestModeration(dto.isRequestModeration());
         if (dto.getTitle() != null) event.setTitle(dto.getTitle());
     }

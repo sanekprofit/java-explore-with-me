@@ -15,12 +15,12 @@ public class NewUserRequest {
 
     @Email
     @NotNull
-    @Size(max = 255, min = 6)
+    @Size(max = 254, min = 6)
     String email;
 
     @NotNull
     @NotBlank
-    @Size(max = 255, min = 2)
+    @Size(max = 250, min = 2)
     String name;
 
 }

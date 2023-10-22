@@ -49,7 +49,7 @@ public class PrivateEventController {
     @PatchMapping("/events/{eventId}")
     public EventFullDto patchEvent(@PathVariable Integer userId,
                                    @PathVariable Long eventId,
-                                   @RequestBody UpdateEventUserRequest eventDto) {
+                                   @Valid @RequestBody UpdateEventUserRequest eventDto) {
         log.info(String.format("Received PATCH events request. user id: {%d} event id: {%d} dto: {%s}", userId, eventId, eventDto));
         return service.patchEvent(userId, eventId, eventDto);
     }
