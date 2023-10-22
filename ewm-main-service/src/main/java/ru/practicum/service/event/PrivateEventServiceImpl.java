@@ -129,7 +129,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     public EventFullDto patchEvent(Integer userId, Long eventId, UpdateEventUserRequest eventDto) {
 
-        if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+        if (eventDto.getEventDate() != null && eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictParamException("For the requested operation the event date are not met.");
         }
 
@@ -307,12 +307,15 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     private void patch(Event event, UpdateEventUserRequest eventDto) {
+        event.setEventDate(eventDto.getEventDate());
         if (eventDto.getAnnotation() != null) event.setAnnotation(eventDto.getAnnotation());
-        event.setCategory(getCategoryById(eventDto.getCategory()));
+        if (eventDto.getCategory() != 0) event.setCategory(getCategoryById(eventDto.getCategory()));
         if (eventDto.getDescription() != null) event.setDescription(event.getDescription());
         if (eventDto.getEventDate() != null) event.setEventDate(eventDto.getEventDate());
-        event.setLatitude(eventDto.getLocation().getLat());
-        event.setLongitude(eventDto.getLocation().getLon());
+        if (eventDto.getLocation() != null) {
+            event.setLatitude(eventDto.getLocation().getLat());
+            event.setLongitude(eventDto.getLocation().getLon());
+        }
         event.setPaid(eventDto.isPaid());
         event.setParticipantLimit(eventDto.getParticipantLimit());
         event.setRequestModeration(eventDto.isRequestModeration());

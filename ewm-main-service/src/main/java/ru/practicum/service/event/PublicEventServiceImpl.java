@@ -69,9 +69,9 @@ public class PublicEventServiceImpl implements PublicEventService {
             }
         }
 
-        if (sort.equals("EVENT_DATE")) {
+        if (sort != null && sort.equals("EVENT_DATE")) {
             dtos.sort(Comparator.comparing(EventShortDto::getEventDate));
-        } else if (sort.equals("VIEWS")) {
+        } else if (sort != null && sort.equals("VIEWS")) {
             dtos.sort(Comparator.comparing(EventShortDto::getViews).reversed());
         }
 
