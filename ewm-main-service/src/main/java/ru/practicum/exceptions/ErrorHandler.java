@@ -81,6 +81,6 @@ public class ErrorHandler {
     }
 
     private void logError(Throwable e) {
-        log.error(String.format("%s throw an exception. message: %s", e.getClass().toString(), e.getMessage()));
+        log.error(String.format("%s throw an exception. message: %s cause: %s", e.getClass().toString(), e.getMessage(), e.getCause().toString()));
     }
 }

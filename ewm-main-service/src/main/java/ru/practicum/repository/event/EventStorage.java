@@ -46,11 +46,11 @@ public class EventStorage {
         }
 
         if (start != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("event_date"), parseDateTime(start)));
+            predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), parseDateTime(start)));
         }
 
         if (end != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("event_date"), parseDateTime(end)));
+            predicates.add(cb.lessThanOrEqualTo(root.get("eventDate"), parseDateTime(end)));
         }
 
         criteriaQuery.select(root).where(cb.and(predicates.toArray(Predicate[]::new)));
@@ -80,9 +80,9 @@ public class EventStorage {
 
         if (text != null && !text.isBlank()) {
             predicates.add(cb.or(
-                    craetSearchPredicate(cb, root, "title", text),
-                    craetSearchPredicate(cb, root, "annotation", text),
-                    craetSearchPredicate(cb, root, "description", text)));
+                    createSearchPredicate(cb, root, "title", text),
+                    createSearchPredicate(cb, root, "annotation", text),
+                    createSearchPredicate(cb, root, "description", text)));
         }
 
         if (categories != null && categories.isEmpty()) {
@@ -90,10 +90,10 @@ public class EventStorage {
         }
 
         if (rangeStart != null && rangeEnd != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("event_date"), parseDateTime(rangeStart)));
-            predicates.add(cb.lessThanOrEqualTo(root.get("event_date"), parseDateTime(rangeEnd)));
+            predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), parseDateTime(rangeStart)));
+            predicates.add(cb.lessThanOrEqualTo(root.get("eventDate"), parseDateTime(rangeEnd)));
         } else {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("event_date"), LocalDateTime.now()));
+            predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), LocalDateTime.now()));
         }
 
         if (paid != null) {
@@ -110,7 +110,7 @@ public class EventStorage {
         return query.getResultList();
     }
 
-    private Predicate craetSearchPredicate(CriteriaBuilder builder,
+    private Predicate createSearchPredicate(CriteriaBuilder builder,
                                            Root<Event> root,
                                            String field,
                                            String searchSrt) {
