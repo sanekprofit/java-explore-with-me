@@ -29,6 +29,7 @@ public class Participation {
     @JoinColumn(name = "requester_id")
     User requester;
 
+    @Enumerated(EnumType.STRING)
     ParticipantState status = ParticipantState.PENDING;
 
     public Participation(Event event, User requester) {
