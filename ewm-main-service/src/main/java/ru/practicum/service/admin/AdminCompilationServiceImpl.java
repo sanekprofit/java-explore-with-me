@@ -42,7 +42,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
 
     @Override
     public CompilationDto postCompilation(NewCompilationDto dto) {
-        if (!dto.getEvents().isEmpty()) {
+        if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
             List<Event> events = eventRepository.findAllById(dto.getEvents());
             Compilation compilation = new Compilation(events, dto.isPinned(), dto.getTitle());
             List<EventShortDto> eventShort = events.stream()
@@ -76,7 +76,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
             throw new NotFoundException(String.format("Compilation with id %d not found", compId));
         }
         Compilation compilation = compOpt.get();
-        if (!dto.getEvents().isEmpty()) {
+        if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
             List<Event> events = eventRepository.findAllById(dto.getEvents());
             List<EventShortDto> eventShort = events.stream()
                     .map(event -> EventMapper.toEventShortDto(event,
