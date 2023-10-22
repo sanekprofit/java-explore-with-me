@@ -21,6 +21,7 @@ import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.NewEventDto;
 import ru.practicum.model.event.dto.UpdateEventUserRequest;
 import ru.practicum.model.event.enums.EventState;
+import ru.practicum.model.event.enums.UserStateAction;
 import ru.practicum.model.participation.Participation;
 import ru.practicum.model.participation.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.model.participation.dto.ParticipationRequestDto;
@@ -319,11 +320,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             event.setLatitude(eventDto.getLocation().getLat());
             event.setLongitude(eventDto.getLocation().getLon());
         }
-        event.setPaid(eventDto.isPaid());
+        if (eventDto.getStateAction().equals(UserStateAction.SEND_TO_REVIEW)) event.setState(EventState.PENDING);
+        if (eventDto.getStateAction().equals(UserStateAction.CANCEL_REVIEW)) event.setState(EventState.CANCELED);
         if (eventDto.getParticipantLimit() != 0) event.setParticipantLimit(eventDto.getParticipantLimit());
         event.setRequestModeration(eventDto.isRequestModeration());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
-        event.setState(EventState.CANCELED);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.BaseClient;
 import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
+import ru.practicum.exceptions.BadParamException;
 import ru.practicum.exceptions.NotFoundException;
 import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.EventMapper;
@@ -47,9 +48,14 @@ public class PublicEventServiceImpl implements PublicEventService {
                                          int from,
                                          int size,
                                          String ip) {
-
-
         List<Event> events = storage.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, from, size);
+
+        if (text.equals("0")) {
+            throw new BadParamException("Incorrect type of text");
+        }
+        if (categories.contains(0)) {
+            throw new BadParamException("Incorrect type of categories");
+        }
 
         List<EventShortDto> dtos = new ArrayList<>();
         for (Event event : events) {
