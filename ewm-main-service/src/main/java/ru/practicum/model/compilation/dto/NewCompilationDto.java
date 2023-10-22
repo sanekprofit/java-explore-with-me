@@ -13,7 +13,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewCompilationDto {
 
-    List<Integer> events;
+    List<Long> events;
 
     boolean pinned;
 

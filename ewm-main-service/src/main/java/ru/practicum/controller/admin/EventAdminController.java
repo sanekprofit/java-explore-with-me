@@ -31,7 +31,7 @@ public class EventAdminController {
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto patchEvent(@PathVariable Integer eventId,
+    public EventFullDto patchEvent(@PathVariable Long eventId,
                                    @RequestBody UpdateEventAdminRequest dto) {
         log.info(String.format("Received PATCH event admin request. event id: {%d} dto: {%s}", eventId, dto));
         return service.patchEvent(eventId, dto);

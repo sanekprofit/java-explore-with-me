@@ -9,6 +9,6 @@ public interface AdminEventService {
 
     List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size);
 
-    EventFullDto patchEvent(Integer eventId, UpdateEventAdminRequest dto);
+    EventFullDto patchEvent(Long eventId, UpdateEventAdminRequest dto);
 
 }

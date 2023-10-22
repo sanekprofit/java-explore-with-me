@@ -80,7 +80,7 @@ public class PublicEventServiceImpl implements PublicEventService {
     }
 
     @Override
-    public EventFullDto getEvent(Integer eventId, String ip) {
+    public EventFullDto getEvent(Long eventId, String ip) {
         Optional<Event> eventOpt = repository.findFirstByIdAndStateEquals(eventId, EventState.PUBLISHED);
         if (eventOpt.isEmpty()) {
             throw new NotFoundException(String.format("Event with id %d not found", eventId));
@@ -106,7 +106,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         return participations.size();
     }
 
-    private int getViews(int eventId) {
+    private int getViews(Long eventId) {
         String uri = "events/" + eventId;
         List<HitResponseDto> viewsList;
         try {

@@ -103,7 +103,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
         return participations.size();
     }
 
-    private long getViews(int eventId) {
+    private long getViews(Long eventId) {
         String uri = "events/" + eventId;
         List<HitResponseDto> viewsList;
         try {

@@ -44,7 +44,7 @@ public class PublicEventController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEvent(@PathVariable Integer id, HttpServletRequest request) {
+    public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
         log.info(String.format("Received GET public event request. event id: {%d}", id));
         return service.getEvent(id, request.getRemoteAddr());
     }

@@ -41,14 +41,14 @@ public class PrivateEventController {
 
     @GetMapping("/events/{eventId}")
     public EventFullDto getEventById(@PathVariable Integer userId,
-                                     @PathVariable Integer eventId) {
+                                     @PathVariable Long eventId) {
         log.info(String.format("Received GET event request. user id: {%d}, event id: {%d}", userId, eventId));
         return service.getEventById(userId, eventId);
     }
 
     @PatchMapping("/events/{eventId}")
     public EventFullDto patchEvent(@PathVariable Integer userId,
-                                   @PathVariable Integer eventId,
+                                   @PathVariable Long eventId,
                                    @RequestBody UpdateEventUserRequest eventDto) {
         log.info(String.format("Received PATCH events request. user id: {%d} event id: {%d} dto: {%s}", userId, eventId, eventDto));
         return service.patchEvent(userId, eventId, eventDto);
@@ -56,14 +56,14 @@ public class PrivateEventController {
 
     @GetMapping("/events/{eventId}/requests")
     public List<ParticipationRequestDto> getParticipationsByEventId(@PathVariable Integer userId,
-                                                              @PathVariable Integer eventId) {
+                                                              @PathVariable Long eventId) {
         log.info(String.format("Received GET participations by event id. user id: {%d} event id: {%d}", userId, eventId));
         return service.getParticipationsByEventId(userId, eventId);
     }
 
     @PatchMapping("/events/{eventId}/requests")
     public List<ParticipationRequestDto> updateRequestStatus(@PathVariable Integer userId,
-                                                             @PathVariable Integer eventId,
+                                                             @PathVariable Long eventId,
                                                              @RequestBody EventRequestStatusUpdateRequest dto) {
         log.info(String.format("Received PATCH request status. user id: {%d} event id: {%d} dto: {%s}", userId, eventId, dto));
         return service.updateRequestStatus(userId, eventId, dto);
@@ -78,7 +78,7 @@ public class PrivateEventController {
     @PostMapping("/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto postParticipation(@PathVariable Integer userId,
-                                                     @RequestParam Integer eventId) {
+                                                     @RequestParam Long eventId) {
         log.info(String.format("Received POST participation request. user id: {%d} event id: {%d}", userId, eventId));
         return service.postParticipation(userId, eventId);
     }

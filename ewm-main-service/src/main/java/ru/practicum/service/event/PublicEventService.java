@@ -18,6 +18,6 @@ public interface PublicEventService {
                                   int size,
                                   String ip);
 
-    EventFullDto getEvent(Integer eventId, String ip);
+    EventFullDto getEvent(Long eventId, String ip);
 
 }

@@ -60,7 +60,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     @Override
-    public EventFullDto patchEvent(Integer eventId, UpdateEventAdminRequest dto) {
+    public EventFullDto patchEvent(Long eventId, UpdateEventAdminRequest dto) {
         Optional<Event> eventOpt = repository.findById(eventId);
         if (eventOpt.isEmpty()) {
             throw new NotFoundException(String.format("Event with id %d not found.", eventId));

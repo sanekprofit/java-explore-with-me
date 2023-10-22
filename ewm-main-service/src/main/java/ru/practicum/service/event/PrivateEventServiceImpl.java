@@ -106,7 +106,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
-    public EventFullDto getEventById(Integer userId, Integer eventId) {
+    public EventFullDto getEventById(Integer userId, Long eventId) {
         Optional<Event> eventOpt = repository.findFirstByIdAndInitiator_Id(eventId, userId);
         if (eventOpt.isEmpty()) {
             throw new NotFoundException(String.format("Event with id %d and user id %d not found", eventId, userId));
@@ -127,7 +127,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
-    public EventFullDto patchEvent(Integer userId, Integer eventId, UpdateEventUserRequest eventDto) {
+    public EventFullDto patchEvent(Integer userId, Long eventId, UpdateEventUserRequest eventDto) {
 
         if (eventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictParamException("For the requested operation the event date are not met.");
@@ -161,7 +161,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
-    public List<ParticipationRequestDto> getParticipationsByEventId(Integer userId, Integer eventId) {
+    public List<ParticipationRequestDto> getParticipationsByEventId(Integer userId, Long eventId) {
         List<ParticipationRequestDto> dtos = new ArrayList<>();
 
         List<Participation> participations = participationRepository.findAllByEvent_IdAndEvent_Initiator_Id(eventId, userId);
@@ -178,7 +178,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
-    public List<ParticipationRequestDto> updateRequestStatus(Integer userId, Integer eventId, EventRequestStatusUpdateRequest dto) {
+    public List<ParticipationRequestDto> updateRequestStatus(Integer userId, Long eventId, EventRequestStatusUpdateRequest dto) {
         List<ParticipationRequestDto> dtos = new ArrayList<>();
 
         List<Participation> participations = participationRepository.findAllByEvent_IdAndEvent_Initiator_Id(eventId, userId);
@@ -215,7 +215,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
-    public ParticipationRequestDto postParticipation(Integer userId, Integer eventId) {
+    public ParticipationRequestDto postParticipation(Integer userId, Long eventId) {
 
         Optional<Participation> participationAgain = participationRepository.findFirstByRequester_Id(userId);
         if (participationAgain.isPresent()) {
@@ -293,7 +293,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         return userOpt.get();
     }
 
-    private int getViews(int eventId) {
+    private int getViews(Long eventId) {
         String uri = "events/" + eventId;
         List<HitResponseDto> viewsList;
         try {

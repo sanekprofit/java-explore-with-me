@@ -15,17 +15,17 @@ public interface PrivateEventService {
 
     List<EventShortDto> getEventsByUserId(Integer userId, int from, int size);
 
-    EventFullDto getEventById(Integer userId, Integer eventId);
+    EventFullDto getEventById(Integer userId, Long eventId);
 
-    EventFullDto patchEvent(Integer userId, Integer eventId, UpdateEventUserRequest eventDto);
+    EventFullDto patchEvent(Integer userId, Long eventId, UpdateEventUserRequest eventDto);
 
-    List<ParticipationRequestDto> getParticipationsByEventId(Integer userId, Integer eventId);
+    List<ParticipationRequestDto> getParticipationsByEventId(Integer userId, Long eventId);
 
-    List<ParticipationRequestDto> updateRequestStatus(Integer userId, Integer eventId, EventRequestStatusUpdateRequest dto);
+    List<ParticipationRequestDto> updateRequestStatus(Integer userId, Long eventId, EventRequestStatusUpdateRequest dto);
 
     List<ParticipationRequestDto> getUserParticipations(Integer userId);
 
-    ParticipationRequestDto postParticipation(Integer userId, Integer eventId);
+    ParticipationRequestDto postParticipation(Integer userId, Long eventId);
 
     ParticipationRequestDto patchParticipation(Integer userId, Integer requestId);
 

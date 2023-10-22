@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Integer> {
+public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByInitiator_Id(Integer userId, Pageable pageable);
 
-    Optional<Event> findFirstByIdAndInitiator_Id(Integer eventId, Integer userId);
+    Optional<Event> findFirstByIdAndInitiator_Id(Long eventId, Integer userId);
 
     @Query("SELECT e FROM Event e WHERE " +
             "(:users IS NULL OR e.initiator.id IN :users) " +
@@ -64,5 +64,5 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
                                           Pageable pageable
     );
 
-    Optional<Event> findFirstByIdAndStateEquals(Integer eventId, EventState state);
+    Optional<Event> findFirstByIdAndStateEquals(Long eventId, EventState state);
 }

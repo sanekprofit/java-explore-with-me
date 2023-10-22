@@ -29,7 +29,7 @@ public class EventFullDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime eventDate;
 
-    int id;
+    Long id;
 
     UserShortDto initiator;
 
@@ -51,7 +51,7 @@ public class EventFullDto {
     long views;
 
     public EventFullDto(String annotation, CategoryDto category, int confirmedRequests, LocalDateTime createdOn, String description,
-                        LocalDateTime eventDate, int id, UserShortDto initiator, Location location, boolean paid,
+                        LocalDateTime eventDate, Long id, UserShortDto initiator, Location location, boolean paid,
                         int participantLimit, boolean requestModeration, EventState state, String title, long views) {
         this.annotation = annotation;
         this.category = category;

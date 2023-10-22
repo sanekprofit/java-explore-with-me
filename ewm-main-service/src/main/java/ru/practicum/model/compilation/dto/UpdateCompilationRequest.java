@@ -10,7 +10,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateCompilationRequest {
 
-    List<Integer> events;
+    List<Long> events;
 
     boolean pinned;
 

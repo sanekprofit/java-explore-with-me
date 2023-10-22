@@ -25,7 +25,7 @@ public class EventMapper {
     }
 
     public static EventFullDto toEventFullDto(String annotation, CategoryDto categoryDto, int confirmedRequests, LocalDateTime createdOn,
-                                              String description, LocalDateTime eventDate, int id, UserShortDto initiator,
+                                              String description, LocalDateTime eventDate, Long id, UserShortDto initiator,
                                               Location location, boolean paid, int participantLimit,
                                               boolean requestModeration, EventState state, String title, long views) {
         return new EventFullDto(annotation, categoryDto, confirmedRequests, createdOn, description, eventDate, id, initiator, location,
@@ -33,7 +33,7 @@ public class EventMapper {
     }
 
     public static EventShortDto toEventShortDto(String annotation, CategoryDto categoryDto, int confirmedRequests,
-                                                LocalDateTime eventDate, int id, UserShortDto initiator, boolean paid,
+                                                LocalDateTime eventDate, Long id, UserShortDto initiator, boolean paid,
                                                 String title, long views) {
         return new EventShortDto(annotation, categoryDto, confirmedRequests, eventDate, id, initiator, paid, title, views);
     }
