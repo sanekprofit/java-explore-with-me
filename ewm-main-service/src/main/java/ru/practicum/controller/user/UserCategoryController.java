@@ -17,8 +17,8 @@ public class UserCategoryController {
     private final UserCategoryService service;
 
     @GetMapping
-    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") int from,
-                                           @RequestParam(defaultValue = "10") int size) {
+    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0", required = false) int from,
+                                           @RequestParam(defaultValue = "10", required = false) int size) {
         log.info(String.format("Received GET categories request. from: {%d} size: {%d}", from, size));
         return service.getCategories(from, size);
     }

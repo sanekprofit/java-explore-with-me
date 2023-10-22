@@ -18,8 +18,8 @@ public class UserCompilationController {
 
     @GetMapping
     public List<CompilationDto> getCompilations(@RequestParam boolean pinned,
-                                                @RequestParam int from,
-                                                @RequestParam int size) {
+                                                @RequestParam(defaultValue = "0", required = false) int from,
+                                                @RequestParam(defaultValue = "10", required = false) int size) {
         log.info(String.format("Received GET compilations request. pinned: {%b} from: {%d} size: {%d}", pinned, from, size));
         return service.getCompilations(pinned, from, size);
     }

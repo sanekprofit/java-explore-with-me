@@ -24,10 +24,10 @@ public class PublicEventController {
                                          @RequestParam boolean paid,
                                          @RequestParam String rangeStart,
                                          @RequestParam String rangeEnd,
-                                         @RequestParam boolean onlyAvailable,
+                                         @RequestParam(defaultValue = "false", required = false) boolean onlyAvailable,
                                          @RequestParam String sort,
-                                         @RequestParam int from,
-                                         @RequestParam int size,
+                                         @RequestParam(defaultValue = "0", required = false) int from,
+                                         @RequestParam(defaultValue = "10", required = false) int size,
                                          HttpServletRequest request) {
         log.info(String.format("Received GET public events request. text: {%s} categories : %s paid : {%b} start : {%s} " +
                         "end: {%s} onlyAvailable: {%b} sort: {%s} from: {%d} size: {%d}",

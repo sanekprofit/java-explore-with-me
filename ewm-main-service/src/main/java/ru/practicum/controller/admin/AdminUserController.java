@@ -27,8 +27,8 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public List<UserDto> getUsers(@RequestParam(defaultValue = "0") int from,
-                                  @RequestParam(defaultValue = "10") int size,
+    public List<UserDto> getUsers(@RequestParam(defaultValue = "0", required = false) int from,
+                                  @RequestParam(defaultValue = "10", required = false) int size,
                                   @RequestParam(required = false) List<Integer> ids) {
         log.info(String.format("Received GET users request. from: {%d} size: {%d} ids: {%s}", from, size, ids));
         return service.getUsers(from, size, ids);

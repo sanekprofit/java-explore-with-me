@@ -33,8 +33,8 @@ public class PrivateEventController {
 
     @GetMapping("/events")
     public List<EventShortDto> getEventsByUserId(@PathVariable Integer userId,
-                                             @RequestParam(defaultValue = "0") int from,
-                                             @RequestParam(defaultValue = "10") int size) {
+                                             @RequestParam(defaultValue = "0", required = false) int from,
+                                             @RequestParam(defaultValue = "10", required = false) int size) {
         log.info(String.format("Received GET events request. user id: {%d} from: {%d} size: {%d}", userId, from, size));
         return service.getEventsByUserId(userId, from, size);
     }

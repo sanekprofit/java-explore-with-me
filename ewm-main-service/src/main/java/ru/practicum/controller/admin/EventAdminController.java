@@ -23,8 +23,8 @@ public class EventAdminController {
                                               @RequestParam List<Integer> categories,
                                               @RequestParam String rangeStart,
                                               @RequestParam String rangeEnd,
-                                              @RequestParam int from,
-                                              @RequestParam int size) {
+                                              @RequestParam(defaultValue = "0", required = false) int from,
+                                              @RequestParam(defaultValue = "10", required = false) int size) {
         log.info(String.format("Received GET events search. users: %s states: %s categories: %s start: %s end: %s from: %d size: %d",
                 users, states, categories, rangeStart, rangeEnd, from, size));
         return service.getEventsSearch(users, states, categories, rangeStart, rangeEnd, from, size);
