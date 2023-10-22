@@ -13,16 +13,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
-public class EventAdminController {
+public class AdminEventController {
 
     private final AdminEventService service;
 
     @GetMapping
-    public List<EventFullDto> getEventsSearch(@RequestParam List<Integer> users,
-                                              @RequestParam List<String> states,
-                                              @RequestParam List<Integer> categories,
-                                              @RequestParam String rangeStart,
-                                              @RequestParam String rangeEnd,
+    public List<EventFullDto> getEventsSearch(@RequestParam(required = false) List<Integer> users,
+                                              @RequestParam(required = false) List<String> states,
+                                              @RequestParam(required = false) List<Integer> categories,
+                                              @RequestParam(required = false) String rangeStart,
+                                              @RequestParam(required = false) String rangeEnd,
                                               @RequestParam(defaultValue = "0", required = false) int from,
                                               @RequestParam(defaultValue = "10", required = false) int size) {
         log.info(String.format("Received GET events search. users: %s states: %s categories: %s start: %s end: %s from: %d size: %d",
