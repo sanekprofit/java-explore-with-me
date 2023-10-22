@@ -1,8 +1,8 @@
 package ru.practicum.service.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.BaseClient;
 import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
@@ -16,8 +16,8 @@ import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.enums.EventState;
 import ru.practicum.model.participation.Participation;
 import ru.practicum.model.participation.enums.ParticipantState;
-import ru.practicum.model.utilities.SelfFormatter;
 import ru.practicum.repository.event.EventRepository;
+import ru.practicum.repository.event.EventStorage;
 import ru.practicum.repository.event.ParticipationRepository;
 
 import java.time.LocalDateTime;
@@ -29,28 +29,27 @@ public class PublicEventServiceImpl implements PublicEventService {
 
     private final BaseClient statClient;
 
+    private final EventStorage storage;
+
     private final ParticipationRepository participationRepository;
 
     private final EventRepository repository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getEvents(String text,
                                          List<Integer> categories,
-                                         boolean paid,
+                                         Boolean paid,
                                          String rangeStart,
                                          String rangeEnd,
-                                         boolean onlyAvailable,
+                                         Boolean onlyAvailable,
                                          String sort,
                                          int from,
                                          int size,
                                          String ip) {
-        List<Event> events = new ArrayList<>();
-        if (rangeStart == null && rangeEnd == null) {
-            events.addAll(repository.findEventsWithoutDateTime(text.toLowerCase(), categories, paid, LocalDateTime.now(), EventState.PUBLISHED, PageRequest.of(from, size)));
-        } else {
-            events.addAll(repository.findEventsWithDateTime(text.toLowerCase(), categories, paid, parseDateTime(rangeStart),
-                    parseDateTime(rangeEnd), EventState.PUBLISHED, PageRequest.of(from, size)));
-        }
+
+
+        List<Event> events = storage.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, from, size);
 
         List<EventShortDto> dtos = new ArrayList<>();
         for (Event event : events) {
@@ -97,16 +96,12 @@ public class PublicEventServiceImpl implements PublicEventService {
                 getViews(eventId));
     }
 
-    private LocalDateTime parseDateTime(String dateTime) {
-        return dateTime == null ? null : LocalDateTime.parse(dateTime, SelfFormatter.FORMAT);
-    }
-
     private int getConfirmedRequests() {
         List<Participation> participations = participationRepository.findAllByStatusEquals(ParticipantState.CONFIRMED);
         return participations.size();
     }
 
-    private int getViews(Long eventId) {
+    private Long getViews(Long eventId) {
         String uri = "events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
@@ -116,6 +111,8 @@ public class PublicEventServiceImpl implements PublicEventService {
         }
         HitResponseDto view = viewsList.isEmpty() ? new HitResponseDto("ewm-main-service", uri, 0L) : viewsList.get(0);
 
-        return Math.toIntExact(view.getHits());
+        return view.getHits();
     }
+
+
 }

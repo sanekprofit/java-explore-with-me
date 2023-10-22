@@ -9,10 +9,10 @@ public interface PublicEventService {
 
     List<EventShortDto> getEvents(String text,
                                   List<Integer> categories,
-                                  boolean paid,
+                                  Boolean paid,
                                   String rangeStart,
                                   String rangeEnd,
-                                  boolean onlyAvailable,
+                                  Boolean onlyAvailable,
                                   String sort,
                                   int from,
                                   int size,

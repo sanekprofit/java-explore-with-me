@@ -1,8 +1,8 @@
 package ru.practicum.service.admin;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.BaseClient;
 import ru.practicum.HitResponseDto;
 import ru.practicum.exceptions.ConflictParamException;
@@ -22,20 +22,20 @@ import ru.practicum.model.participation.Participation;
 import ru.practicum.model.participation.enums.ParticipantState;
 import ru.practicum.model.user.User;
 import ru.practicum.model.user.dto.UserShortDto;
-import ru.practicum.model.utilities.SelfFormatter;
 import ru.practicum.repository.category.CategoryRepository;
 import ru.practicum.repository.event.EventRepository;
+import ru.practicum.repository.event.EventStorage;
 import ru.practicum.repository.event.ParticipationRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AdminEventServiceImpl implements AdminEventService {
+
+    private final EventStorage storage;
 
     private final CategoryRepository categoryRepository;
 
@@ -46,16 +46,15 @@ public class AdminEventServiceImpl implements AdminEventService {
     private final EventRepository repository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size) {
-        List<Event> events = repository.findEventsByParameters(users, parseStates(states), categories, parseDateTime(start),
-                parseDateTime(end), PageRequest.of(from, size));
-
+        List<Event> events = storage.getAdminEventsSearch(users, states, categories, start, end, from, size);
         return events.stream()
                 .map(event -> EventMapper.toEventFullDto(event,
                         CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
                         getConfirmedRequests(),
                         UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
-                        getViews(event)))
+                        getViews(event.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -98,19 +97,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(), event.getCreatedOn(),
                 event.getDescription(), event.getEventDate(), event.getId(), userShortDto,
                 new Location(event.getLatitude(), event.getLongitude()), event.isPaid(), event.getParticipantLimit(),
-                event.isRequestModeration(), event.getState(), event.getTitle(), getViews(event));
-    }
-
-    private LocalDateTime parseDateTime(String dateTime) {
-        return dateTime == null ? null : LocalDateTime.parse(dateTime, SelfFormatter.FORMAT);
-    }
-
-    private List<EventState> parseStates(List<String> states) {
-        if (states != null && !states.isEmpty()) {
-            return states.stream()
-                    .map(EventState::valueOf).collect(Collectors.toList());
-        }
-        return List.of();
+                event.isRequestModeration(), event.getState(), event.getTitle(), getViews(event.getId()));
     }
 
     private Category getCategoryById(Integer catId) {
@@ -126,8 +113,8 @@ public class AdminEventServiceImpl implements AdminEventService {
         return participations.size();
     }
 
-    private long getViews(Event event) {
-        String uri = "events/" + event.getId();
+    private long getViews(Long eventId) {
+        String uri = "events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
             viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), false);

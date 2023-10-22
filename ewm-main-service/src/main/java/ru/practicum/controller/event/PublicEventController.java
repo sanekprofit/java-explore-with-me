@@ -21,10 +21,10 @@ public class PublicEventController {
     @GetMapping
     public List<EventShortDto> getEvents(@RequestParam String text,
                                          @RequestParam List<Integer> categories,
-                                         @RequestParam boolean paid,
+                                         @RequestParam Boolean paid,
                                          @RequestParam String rangeStart,
                                          @RequestParam String rangeEnd,
-                                         @RequestParam(defaultValue = "false", required = false) boolean onlyAvailable,
+                                         @RequestParam(defaultValue = "false", required = false) Boolean onlyAvailable,
                                          @RequestParam String sort,
                                          @RequestParam(defaultValue = "0", required = false) int from,
                                          @RequestParam(defaultValue = "10", required = false) int size,
