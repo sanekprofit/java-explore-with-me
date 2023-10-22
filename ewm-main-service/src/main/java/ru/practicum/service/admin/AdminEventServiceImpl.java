@@ -128,7 +128,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     private void patch(Event event, UpdateEventAdminRequest dto) {
         if (dto.getAnnotation() != null) event.setAnnotation(dto.getAnnotation());
-        event.setCategory(getCategoryById(dto.getCategory()));
+        if (dto.getCategory() != 0) event.setCategory(getCategoryById(dto.getCategory()));
         if (dto.getDescription() != null) event.setDescription(dto.getDescription());
         if (dto.getEventDate() != null) event.setEventDate(dto.getEventDate());
         if (dto.getLocation() != null) {
