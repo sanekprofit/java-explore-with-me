@@ -46,6 +46,7 @@ public class Event {
 
     boolean paid;
 
+    @Column(name = "participant_limit")
     int participantLimit;
 
     @Column(name = "published")
