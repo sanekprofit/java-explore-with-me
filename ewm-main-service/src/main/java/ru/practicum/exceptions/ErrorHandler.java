@@ -68,8 +68,7 @@ public class ErrorHandler {
                 e.getMessage(),
                 LocalDateTime.now());
     }
-
-    @ExceptionHandler
+/*    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
         logError(e);
@@ -79,8 +78,8 @@ public class ErrorHandler {
                 e.getMessage(),
                 LocalDateTime.now());
     }
-
+*/
     private void logError(Throwable e) {
-        log.error(String.format("%s throw an exception. message: %s cause: %s", e.getClass().toString(), e.getMessage(), e.getCause().toString()));
+        log.error(String.format("%s throw an exception. message: %s", e.getClass().toString(), e.getMessage()));
     }
 }
