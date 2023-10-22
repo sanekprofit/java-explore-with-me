@@ -1,6 +1,5 @@
 package ru.practicum.model.event.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -27,7 +26,6 @@ public class NewEventDto {
     @Size(max = 7000, min = 20)
     String description;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime eventDate;
 
     Location location;
