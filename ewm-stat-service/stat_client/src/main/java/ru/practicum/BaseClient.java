@@ -30,7 +30,7 @@ public class BaseClient {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public BaseClient(@Value("${ewm-stat-service.url}") String serverUrl, RestTemplateBuilder builder) {
+    public BaseClient(@Value("${ewm.stat-service.url}") String serverUrl, RestTemplateBuilder builder) {
         this.serverUrl = serverUrl;
         this.rest = builder
                 .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))

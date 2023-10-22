@@ -2,6 +2,7 @@ package ru.practicum.model.compilation;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.model.event.Event;
 
@@ -10,13 +11,14 @@ import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "compilations")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Compilation {
 
     @ManyToMany
     @JoinTable(
-            name = "compilation_events",
+            name = "compilation_event",
             joinColumns = { @JoinColumn(name = "compilation_id") },
             inverseJoinColumns = { @JoinColumn(name = "event_id") }
     )
@@ -30,4 +32,9 @@ public class Compilation {
 
     String title;
 
+    public Compilation(List<Event> events, boolean pinned, String title) {
+        this.events = events;
+        this.pinned = pinned;
+        this.title = title;
+    }
 }

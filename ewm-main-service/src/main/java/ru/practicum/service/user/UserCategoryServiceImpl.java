@@ -35,7 +35,7 @@ public class UserCategoryServiceImpl implements UserCategoryService {
     }
 
     @Override
-    public CategoryDto getCategoryById(Long catId) {
+    public CategoryDto getCategoryById(Integer catId) {
         if (catId == null || catId < 1) {
             throw new BadParamException("Incorrect type of category id.");
         }

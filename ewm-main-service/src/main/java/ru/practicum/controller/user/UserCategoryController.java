@@ -24,7 +24,7 @@ public class UserCategoryController {
     }
 
     @GetMapping("/{catId}")
-    public CategoryDto getCategoryById(@PathVariable Long catId) {
+    public CategoryDto getCategoryById(@PathVariable Integer catId) {
         log.info(String.format("Received GET category request. category id {%d}", catId));
         return service.getCategoryById(catId);
     }

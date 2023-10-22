@@ -8,7 +8,7 @@ public class CategoryMapper {
         return new Category(name);
     }
 
-    public static CategoryDto toCategoryDto(long id, String name) {
+    public static CategoryDto toCategoryDto(int id, String name) {
         return new CategoryDto(id, name);
     }
 }

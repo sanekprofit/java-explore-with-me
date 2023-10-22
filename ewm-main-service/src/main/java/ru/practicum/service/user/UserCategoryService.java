@@ -8,6 +8,6 @@ public interface UserCategoryService {
 
     List<CategoryDto> getCategories(int from, int size);
 
-    CategoryDto getCategoryById(Long catId);
+    CategoryDto getCategoryById(Integer catId);
 
 }

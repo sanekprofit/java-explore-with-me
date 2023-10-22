@@ -20,7 +20,7 @@ public class NewEventDto {
     @Size(max = 2000, min = 20)
     String annotation;
 
-    long category;
+    int category;
 
     @NotNull
     @NotBlank

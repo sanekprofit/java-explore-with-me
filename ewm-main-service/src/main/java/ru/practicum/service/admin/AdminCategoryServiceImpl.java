@@ -28,7 +28,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     }
 
     @Override
-    public void deleteCategory(Long catId) {
+    public void deleteCategory(Integer catId) {
         if (catId == null || catId < 1) {
             throw new BadParamException("Incorrect type of category id.");
         }
@@ -40,7 +40,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
     }
 
     @Override
-    public CategoryDto patchCategory(NewCategoryDto categoryDto, Long catId) {
+    public CategoryDto patchCategory(NewCategoryDto categoryDto, Integer catId) {
         if (catId == null || catId < 1) {
             throw new BadParamException("Incorrect type of category id.");
         }
