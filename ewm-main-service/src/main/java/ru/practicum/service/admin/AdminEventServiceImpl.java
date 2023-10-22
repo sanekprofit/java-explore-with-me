@@ -73,13 +73,13 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         patch(event, dto);
 
-        if (dto.getStateAction().equals(AdminStateAction.PUBLISH_EVENT)) {
+        if (dto.getStateAction() != null && dto.getStateAction().equals(AdminStateAction.PUBLISH_EVENT)) {
             if (event.getState().equals(EventState.PUBLISHED) || event.getState().equals(EventState.CANCELED)) {
                 throw new ConflictParamException("You can only change events in the state of waiting for moderation");
             }
             event.setState(EventState.PUBLISHED);
             event.setPublishedOn(LocalDateTime.now());
-        } else if (dto.getStateAction().equals(AdminStateAction.REJECT_EVENT)) {
+        } else if (dto.getStateAction() != null && dto.getStateAction().equals(AdminStateAction.REJECT_EVENT)) {
             if (event.getState().equals(EventState.PUBLISHED)) {
                 throw new ConflictParamException("You can only deny event that is not published yet.");
             }
