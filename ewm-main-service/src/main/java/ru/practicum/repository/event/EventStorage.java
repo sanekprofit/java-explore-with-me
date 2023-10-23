@@ -29,7 +29,7 @@ public class EventStorage {
 
     @Transactional(readOnly = true)
     public List<Event> getEventsSearch(String text, List<Integer> users, List<String> states, List<Integer> categories,
-                                       Boolean paid, String start, String end, int from, int size) {
+                                       Boolean paid, String start, String end, int from, int size, boolean isPublic) {
         try {
             Session session = sessionFactory.openSession();
             CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -43,6 +43,10 @@ public class EventStorage {
                         createSearchPredicate(cb, root, "title", text),
                         createSearchPredicate(cb, root, "annotation", text),
                         createSearchPredicate(cb, root, "description", text)));
+            }
+
+            if (isPublic) {
+                predicates.add(root.get("state").as(EventState.class).in(EventState.PUBLISHED));
             }
 
             if (users != null) {
@@ -80,7 +84,7 @@ public class EventStorage {
             query.setFirstResult(from);
             query.setMaxResults(size);
 
-            return query.getResultList();
+            return query.getResultStream().collect(Collectors.toList());
         } catch (Exception e) {
             log.error(String.format("Stack trace: %s", e.getStackTrace().toString()));
             throw e;

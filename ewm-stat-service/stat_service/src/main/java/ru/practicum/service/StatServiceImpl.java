@@ -41,9 +41,9 @@ public class StatServiceImpl implements StatService {
 
         if (uris == null || uris.isEmpty() || uris.get(0).equals("/events")) {
             if (!unique) {
-                Set<String> ips = new HashSet<>();
+                List<String> ips = new ArrayList<>();
 
-                List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
+                List<Stat> stats = repository.findAllByTimestampBetween(start, end);
 
                 if (stats.isEmpty()) {
                     return new ArrayList<>(viewStats);
@@ -57,7 +57,7 @@ public class StatServiceImpl implements StatService {
             } else {
                 Set<String> uniqueIps = new HashSet<>();
 
-                List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
+                List<Stat> stats = repository.findAllByTimestampBetween(start, end);
 
                 if (stats.isEmpty()) {
                     return new ArrayList<>(viewStats);
@@ -73,7 +73,7 @@ public class StatServiceImpl implements StatService {
         } else {
             for (String uri : uris) {
                 if (!unique) {
-                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampAfterAndTimestampBefore(uri, start, end);
+                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampBetween(uri, start, end);
 
                     if (stats.isEmpty()) {
                         return new ArrayList<>(viewStats);
@@ -87,7 +87,7 @@ public class StatServiceImpl implements StatService {
                 } else {
                     Set<String> uniqueIps = new HashSet<>();
 
-                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampAfterAndTimestampBefore(uri, start, end);
+                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampBetween(uri, start, end);
 
                     if (stats.isEmpty()) {
                         return new ArrayList<>(viewStats);

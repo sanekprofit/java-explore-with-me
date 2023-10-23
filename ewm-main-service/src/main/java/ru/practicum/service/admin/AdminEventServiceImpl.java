@@ -48,7 +48,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     @Override
     public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size, String ip) {
-        List<Event> events = storage.getEventsSearch(null, users, states, categories, null, start, end, from, size);
+        List<Event> events = storage.getEventsSearch(null, users, states, categories, null, start, end, from, size, false);
         for (Event event : events) {
             statClient.saveHit(new HitDto("ewm-main-service", "/events/" + event.getId(), ip, LocalDateTime.now()));
         }

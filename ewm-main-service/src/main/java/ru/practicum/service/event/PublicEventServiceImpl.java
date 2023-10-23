@@ -46,7 +46,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                                          int from,
                                          int size,
                                          String ip) {
-        List<Event> events = storage.getEventsSearch(text, null, null, categories, paid, start, end, from, size);
+        List<Event> events = storage.getEventsSearch(text, null, null, categories, paid, start, end, from, size, true);
 
         if (text != null && text.equals("0")) {
             throw new BadParamException("Incorrect type of text");
@@ -65,7 +65,6 @@ public class PublicEventServiceImpl implements PublicEventService {
                     getConfirmedRequests(event.getId()),
                     UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                     getViews(event.getId()));
-
             if (onlyAvailable) {
                 if (dto.getConfirmedRequests() <= event.getParticipantLimit()) {
                     dtos.add(dto);
@@ -111,7 +110,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         String uri = "/events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
-            viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), true);
+            viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), false);
         } catch (Exception e) {
             viewsList = Collections.emptyList();
         }
