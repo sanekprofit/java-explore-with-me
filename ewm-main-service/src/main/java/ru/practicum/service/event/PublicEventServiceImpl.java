@@ -64,7 +64,7 @@ public class PublicEventServiceImpl implements PublicEventService {
             statClient.saveHit(new HitDto("ewm-main-service", "events/" + event.getId(), ip, LocalDateTime.now()));
             EventShortDto dto = EventMapper.toEventShortDto(event,
                     CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
-                    getConfirmedRequests(),
+                    getConfirmedRequests(event.getId()),
                     UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                     getViews(event.getId()));
 
@@ -99,13 +99,13 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         return EventMapper.toEventFullDto(event,
                 CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
-                getConfirmedRequests(),
+                getConfirmedRequests(eventId),
                 UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                 getViews(eventId));
     }
 
-    private int getConfirmedRequests() {
-        List<Participation> participations = participationRepository.findAllByStatusEquals(ParticipantState.CONFIRMED);
+    private int getConfirmedRequests(Long eventId) {
+        List<Participation> participations = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
         return participations.size();
     }
 

@@ -57,7 +57,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         return events.stream()
                 .map(event -> EventMapper.toEventFullDto(event,
                         CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
-                        getConfirmedRequests(),
+                        getConfirmedRequests(event.getId()),
                         UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                         getViews(event.getId())))
                 .collect(Collectors.toList());
@@ -99,7 +99,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         repository.save(event);
 
-        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(), event.getCreatedOn(),
+        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(eventId), event.getCreatedOn(),
                 event.getDescription(), event.getEventDate(), event.getId(), userShortDto,
                 new Location(event.getLatitude(), event.getLongitude()), event.isPaid(), event.getParticipantLimit(),
                 event.isRequestModeration(), event.getState(), event.getTitle(), getViews(event.getId()));
@@ -113,8 +113,8 @@ public class AdminEventServiceImpl implements AdminEventService {
         return categoryOpt.get();
     }
 
-    private int getConfirmedRequests() {
-        List<Participation> participations = participationRepository.findAllByStatusEquals(ParticipantState.CONFIRMED);
+    private int getConfirmedRequests(Long eventId) {
+        List<Participation> participations = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
         return participations.size();
     }
 

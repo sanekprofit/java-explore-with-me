@@ -79,7 +79,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         CategoryDto categoryDto = CategoryMapper.toCategoryDto(category.getId(), category.getName());
         UserShortDto userShortDto = UserMapper.toUserShortDto(initiator.getId(), initiator.getName());
 
-        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(), event.getCreatedOn(),
+        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(event.getId()), event.getCreatedOn(),
                 event.getDescription(), event.getEventDate(), event.getId(), userShortDto,
                 new Location(event.getLatitude(), event.getLongitude()), event.isPaid(), event.getParticipantLimit(),
                 event.isRequestModeration(), event.getState(), event.getTitle(), getViews(event.getId()));
@@ -97,7 +97,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
                 UserShortDto userShortDto = UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName());
 
                 EventShortDto eventShortDto = EventMapper.toEventShortDto(event.getAnnotation(), categoryDto,
-                        getConfirmedRequests(), event.getEventDate(), event.getId(), userShortDto, event.isPaid(),
+                        getConfirmedRequests(event.getId()), event.getEventDate(), event.getId(), userShortDto, event.isPaid(),
                         event.getTitle(), getViews(event.getId()));
 
                 dtos.add(eventShortDto);
@@ -121,7 +121,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         CategoryDto categoryDto = CategoryMapper.toCategoryDto(category.getId(), category.getName());
         UserShortDto userShortDto = UserMapper.toUserShortDto(initiator.getId(), initiator.getName());
 
-        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(), event.getCreatedOn(),
+        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(eventId), event.getCreatedOn(),
                 event.getDescription(), event.getEventDate(), event.getId(), userShortDto,
                 new Location(event.getLatitude(), event.getLongitude()), event.isPaid(), event.getParticipantLimit(),
                 event.isRequestModeration(), event.getState(), event.getTitle(), getViews(event.getId()));
@@ -155,7 +155,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         repository.save(event);
 
-        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(), event.getCreatedOn(),
+        return EventMapper.toEventFullDto(event.getAnnotation(), categoryDto, getConfirmedRequests(eventId), event.getCreatedOn(),
                 event.getDescription(), event.getEventDate(), event.getId(), userShortDto,
                 new Location(event.getLatitude(), event.getLongitude()), event.isPaid(), event.getParticipantLimit(),
                 event.isRequestModeration(), event.getState(), event.getTitle(), getViews(event.getId()));
@@ -257,14 +257,14 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Participation participation = new Participation(event, user);
 
-        if (!event.isRequestModeration()) {
+        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             participation.setStatus(ParticipantState.CONFIRMED);
             participationRepository.save(participation);
             return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
                     participation.getId(), participation.getRequester().getId(), participation.getStatus());
         }
 
-        if (getConfirmedRequests() >= event.getParticipantLimit()) {
+        if (getConfirmedRequests(eventId) >= event.getParticipantLimit()) {
             throw new ConflictParamException("Participation limit has reached.");
         }
 
@@ -294,8 +294,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
                 participation.getId(), participation.getRequester().getId(), participation.getStatus());
     }
 
-    private int getConfirmedRequests() {
-        List<Participation> participations = participationRepository.findAllByStatusEquals(ParticipantState.CONFIRMED);
+    private int getConfirmedRequests(Long eventId) {
+        List<Participation> participations = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
         return participations.size();
     }
 
