@@ -50,11 +50,13 @@ public class PublicEventServiceImpl implements PublicEventService {
                                          String ip) {
         List<Event> events = storage.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, from, size);
 
-        if (text.equals("0")) {
+        if (text != null && text.equals("0")) {
             throw new BadParamException("Incorrect type of text");
         }
-        if (categories.contains(0)) {
-            throw new BadParamException("Incorrect type of categories");
+        if (categories != null && !categories.isEmpty()) {
+            for (Integer integer : categories) {
+                if (integer.equals(0)) throw new BadParamException("Incorrect type of categories");
+            }
         }
 
         List<EventShortDto> dtos = new ArrayList<>();
