@@ -2,7 +2,6 @@ package ru.practicum.service.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.BaseClient;
 import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
@@ -48,7 +47,6 @@ public class AdminEventServiceImpl implements AdminEventService {
     private final EventRepository repository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size, String ip) {
         List<Event> events = storage.getEventsSearch(null, users, states, categories, null, start, end, from, size);
         for (Event event : events) {

@@ -2,7 +2,6 @@ package ru.practicum.service.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.BaseClient;
 import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
@@ -37,7 +36,6 @@ public class PublicEventServiceImpl implements PublicEventService {
     private final EventRepository repository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<EventShortDto> getEvents(String text,
                                          List<Integer> categories,
                                          Boolean paid,

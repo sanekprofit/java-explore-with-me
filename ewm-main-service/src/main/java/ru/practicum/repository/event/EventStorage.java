@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.enums.EventState;
 import ru.practicum.model.utilities.SelfFormatter;
@@ -26,6 +27,7 @@ public class EventStorage {
 
     private final SessionFactory sessionFactory;
 
+    @Transactional(readOnly = true)
     public List<Event> getEventsSearch(String text, List<Integer> users, List<String> states, List<Integer> categories,
                                        Boolean paid, String start, String end, int from, int size) {
         try {
@@ -60,15 +62,15 @@ public class EventStorage {
             }
 
             if (start != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), parseDateTime(start)));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate").as(LocalDateTime.class), parseDateTime(start)));
             }
 
             if (end != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("eventDate"), parseDateTime(end)));
+                predicates.add(cb.lessThanOrEqualTo(root.get("eventDate").as(LocalDateTime.class), parseDateTime(end)));
             }
 
             if (start == null && end == null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), LocalDateTime.now()));
+                predicates.add(cb.greaterThan(root.get("eventDate").as(LocalDateTime.class), LocalDateTime.now()));
             }
 
             criteriaQuery.select(root).where(cb.and(predicates.toArray(Predicate[]::new)));
@@ -80,8 +82,8 @@ public class EventStorage {
 
             return query.getResultList();
         } catch (Exception e) {
-            log.error(String.format("Class %s throw an exception. message: %s", e.getClass().toString(), e.getMessage()));
-            return List.of();
+            log.error(String.format("Stack trace: %s", e.getStackTrace().toString()));
+            throw e;
         }
     }
 

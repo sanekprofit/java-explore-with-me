@@ -257,7 +257,12 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Participation participation = new Participation(event, user);
 
-        if ((!event.isRequestModeration() || event.getParticipantLimit() == 0) && getConfirmedRequests(eventId) < event.getParticipantLimit()) {
+        if (!event.isRequestModeration() && getConfirmedRequests(eventId) < event.getParticipantLimit()) {
+            participation.setStatus(ParticipantState.CONFIRMED);
+            participationRepository.save(participation);
+            return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
+                    participation.getId(), participation.getRequester().getId(), participation.getStatus());
+        } else if (event.getParticipantLimit() == 0) {
             participation.setStatus(ParticipantState.CONFIRMED);
             participationRepository.save(participation);
             return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
