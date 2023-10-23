@@ -24,6 +24,7 @@ import ru.practicum.model.event.enums.EventState;
 import ru.practicum.model.event.enums.UserStateAction;
 import ru.practicum.model.participation.Participation;
 import ru.practicum.model.participation.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.model.participation.dto.EventRequestStatusUpdateResult;
 import ru.practicum.model.participation.dto.ParticipationRequestDto;
 import ru.practicum.model.participation.enums.ParticipantState;
 import ru.practicum.model.user.User;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -179,9 +181,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     @Override
-    public List<ParticipationRequestDto> updateRequestStatus(Integer userId, Long eventId, EventRequestStatusUpdateRequest dto) {
-        List<ParticipationRequestDto> dtos = new ArrayList<>();
-
+    public EventRequestStatusUpdateResult updateRequestStatus(Integer userId, Long eventId, EventRequestStatusUpdateRequest dto) {
         List<Participation> participations = participationRepository.findAllByEvent_IdAndEvent_Initiator_Id(eventId, userId);
 
         Optional<Event> eventOpt = repository.findById(eventId);
@@ -204,12 +204,19 @@ public class PrivateEventServiceImpl implements PrivateEventService {
                         part.setStatus(ParticipantState.REJECTED);
                     }
                 }
-                ParticipationRequestDto partDto = ParticipationMapper.toDto(participation.getCreated(),
-                        participation.getEvent().getId(), participation.getId(), participation.getRequester().getId(), participation.getStatus());
-                dtos.add(partDto);
             }
         }
-        return dtos;
+        List<Participation> partConf = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
+        List<Participation> partCanc = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.REJECTED, eventId);
+        List<ParticipationRequestDto> dtoConf = partConf.stream()
+                .map(participation -> ParticipationMapper.toDto(participation.getCreated(),
+                        participation.getEvent().getId(), participation.getId(), participation.getRequester().getId(), participation.getStatus()))
+                .collect(Collectors.toList());
+        List<ParticipationRequestDto> dtoCanc = partCanc.stream()
+                .map(participation -> ParticipationMapper.toDto(participation.getCreated(),
+                        participation.getEvent().getId(), participation.getId(), participation.getRequester().getId(), participation.getStatus()))
+                .collect(Collectors.toList());
+        return ParticipationMapper.toResult(dtoConf, dtoCanc);
     }
 
     @Override

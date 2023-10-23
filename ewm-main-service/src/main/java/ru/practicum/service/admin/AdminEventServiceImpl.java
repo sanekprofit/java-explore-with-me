@@ -140,6 +140,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         }
         if (dto.getPaid() != null) event.setPaid(dto.getPaid());
         if (dto.getParticipantLimit() != 0) event.setParticipantLimit(dto.getParticipantLimit());
+        if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
         if (dto.getTitle() != null) event.setTitle(dto.getTitle());
     }
 }
