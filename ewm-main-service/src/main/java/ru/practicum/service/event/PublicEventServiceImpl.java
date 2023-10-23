@@ -111,7 +111,7 @@ public class PublicEventServiceImpl implements PublicEventService {
         String uri = "events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
-            viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), false);
+            viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), true);
         } catch (Exception e) {
             viewsList = Collections.emptyList();
         }

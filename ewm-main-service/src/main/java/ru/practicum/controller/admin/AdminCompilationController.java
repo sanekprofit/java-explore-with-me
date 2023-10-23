@@ -34,8 +34,8 @@ public class AdminCompilationController {
     }
 
     @PatchMapping("/{compId}")
-    public CompilationDto patchCompilation(@PathVariable Integer compId,
-                                           @Valid @RequestBody UpdateCompilationRequest dto) {
+    public CompilationDto patchCompilation(@Valid @RequestBody UpdateCompilationRequest dto,
+                                           @PathVariable Integer compId) {
         log.info(String.format("Received PATCH compilation request. comp id: {%d} dto: %s", compId, dto));
         return service.patchCompilation(compId, dto);
     }

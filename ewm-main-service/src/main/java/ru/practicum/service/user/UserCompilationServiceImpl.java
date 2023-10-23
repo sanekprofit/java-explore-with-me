@@ -2,6 +2,7 @@ package ru.practicum.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import ru.practicum.BaseClient;
 import ru.practicum.HitResponseDto;
@@ -36,10 +37,15 @@ public class UserCompilationServiceImpl implements UserCompilationService {
     private final CompilationRepository repository;
 
     @Override
-    public List<CompilationDto> getCompilations(boolean pinned, int from, int size) {
+    public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
         List<CompilationDto> dtos = new ArrayList<>();
-
-        List<Compilation> compilations = repository.findAllByPinned(pinned, PageRequest.of(from, size));
+        List<Compilation> compilations;
+        if (pinned == null) {
+            Slice<Compilation> slice = repository.findAll(PageRequest.of(from, size));
+            compilations = slice.getContent();
+        } else {
+            compilations = repository.findAllByPinned(pinned, PageRequest.of(from, size));
+        }
         if (compilations.isEmpty()) {
             throw new NotFoundException("Compilations with parameters not found.");
         }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface UserCompilationService {
 
-    List<CompilationDto> getCompilations(boolean pinned, int from, int size);
+    List<CompilationDto> getCompilations(Boolean pinned, int from, int size);
 
     CompilationDto getCompilation(Integer compId);
 
