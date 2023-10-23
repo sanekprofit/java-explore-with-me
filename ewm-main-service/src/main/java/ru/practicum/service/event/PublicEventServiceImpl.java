@@ -64,7 +64,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                     CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
                     getConfirmedRequests(event.getId()),
                     UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
-                    getViews(event.getId()));
+                    getViews(event.getId(), false));
             if (onlyAvailable) {
                 if (dto.getConfirmedRequests() <= event.getParticipantLimit()) {
                     dtos.add(dto);
@@ -98,7 +98,7 @@ public class PublicEventServiceImpl implements PublicEventService {
                 CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
                 getConfirmedRequests(eventId),
                 UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
-                getViews(eventId));
+                getViews(eventId, true));
     }
 
     private int getConfirmedRequests(Long eventId) {
@@ -106,11 +106,11 @@ public class PublicEventServiceImpl implements PublicEventService {
         return participations.size();
     }
 
-    private Long getViews(Long eventId) {
+    private Long getViews(Long eventId, boolean unique) {
         String uri = "/events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
-            viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), false);
+            viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), unique);
         } catch (Exception e) {
             viewsList = Collections.emptyList();
         }
