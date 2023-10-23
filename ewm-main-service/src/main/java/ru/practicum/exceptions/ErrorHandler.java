@@ -3,6 +3,7 @@ package ru.practicum.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.postgresql.util.PSQLException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -85,6 +86,17 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleJdbcSQLIntegrityConstraint(JdbcSQLIntegrityConstraintViolationException e) {
+        logError(e);
+        return new ErrorResponse(
+                HttpStatus.CONFLICT.toString(),
+                e.getClass().toString(),
+                e.getMessage(),
+                LocalDateTime.now());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrity(DataIntegrityViolationException e) {
         logError(e);
         return new ErrorResponse(
                 HttpStatus.CONFLICT.toString(),
