@@ -48,7 +48,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
             List<EventShortDto> eventShort = events.stream()
                     .map(event -> EventMapper.toEventShortDto(event,
                             CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
-                            getConfirmedRequests(),
+                            getConfirmedRequests(event.getId()),
                             UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                             getViews(event.getId())))
                     .collect(Collectors.toList());
@@ -81,7 +81,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
             List<EventShortDto> eventShort = events.stream()
                     .map(event -> EventMapper.toEventShortDto(event,
                             CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
-                            getConfirmedRequests(),
+                            getConfirmedRequests(event.getId()),
                             UserMapper.toUserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
                             getViews(event.getId())))
                     .collect(Collectors.toList());
@@ -98,8 +98,8 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
         return CompilationMapper.toCompilationDto(new ArrayList<>(), compilation);
     }
 
-    private int getConfirmedRequests() {
-        List<Participation> participations = participationRepository.findAllByStatusEquals(ParticipantState.CONFIRMED);
+    private int getConfirmedRequests(Long eventId) {
+        List<Participation> participations = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
         return participations.size();
     }
 
