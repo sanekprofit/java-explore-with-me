@@ -86,14 +86,14 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
                             getViews(event.getId())))
                     .collect(Collectors.toList());
             compilation.setEvents(events);
-            compilation.setPinned(dto.isPinned());
-            compilation.setTitle(dto.getTitle());
+            if (dto.getPinned() != null) compilation.setPinned(dto.getPinned());
+            if (dto.getTitle() != null) compilation.setTitle(dto.getTitle());
             repository.save(compilation);
             return CompilationMapper.toCompilationDto(eventShort, compilation);
         }
         compilation.setEvents(new ArrayList<>());
-        compilation.setPinned(dto.isPinned());
-        compilation.setTitle(dto.getTitle());
+        if (dto.getPinned() != null) compilation.setPinned(dto.getPinned());
+        if (dto.getTitle() != null) compilation.setTitle(dto.getTitle());
         repository.save(compilation);
         return CompilationMapper.toCompilationDto(new ArrayList<>(), compilation);
     }

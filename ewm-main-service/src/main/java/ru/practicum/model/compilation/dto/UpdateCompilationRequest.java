@@ -13,7 +13,7 @@ public class UpdateCompilationRequest {
 
     List<Long> events;
 
-    boolean pinned;
+    Boolean pinned;
 
     @Size(max = 50, min = 1)
     String title;

@@ -49,6 +49,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         }
         Category category = categoryOpt.get();
 
+        if (categoryDto.getName() != null) category.setName(categoryDto.getName());
         repository.save(category);
         return CategoryMapper.toCategoryDto(category.getId(), categoryDto.getName());
     }
