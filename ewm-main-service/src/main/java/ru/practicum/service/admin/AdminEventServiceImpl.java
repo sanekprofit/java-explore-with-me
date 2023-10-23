@@ -140,9 +140,8 @@ public class AdminEventServiceImpl implements AdminEventService {
             event.setLatitude(dto.getLocation().getLat());
             event.setLongitude(dto.getLocation().getLon());
         }
-        event.setPaid(dto.isPaid());
         if (dto.getParticipantLimit() != 0) event.setParticipantLimit(dto.getParticipantLimit());
-        event.setRequestModeration(dto.isRequestModeration());
+        if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
         if (dto.getTitle() != null) event.setTitle(dto.getTitle());
     }
 }

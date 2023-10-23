@@ -184,12 +184,26 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         List<Participation> participations = participationRepository.findAllByEvent_IdAndEvent_Initiator_Id(eventId, userId);
 
+        Optional<Event> eventOpt = repository.findById(eventId);
+        if (eventOpt.isEmpty()) {
+            throw new NotFoundException(String.format("Event with id %d not found", eventId));
+        }
+
+        Event event = eventOpt.get();
+
         if (!participations.isEmpty()) {
             for (Participation participation : participations) {
-                participation.setStatus(dto.getStatus());
+                if (dto.getStatus() != null && !dto.getStatus().equals(ParticipantState.PENDING)) participation.setStatus(dto.getStatus());
 
                 participationRepository.save(participation);
 
+                List<Participation> partConf = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
+                if (partConf.size() >= event.getParticipantLimit()) {
+                    List<Participation> partPending = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.PENDING, eventId);
+                    for (Participation part : partPending) {
+                        part.setStatus(ParticipantState.REJECTED);
+                    }
+                }
                 ParticipationRequestDto partDto = ParticipationMapper.toDto(participation.getCreated(),
                         participation.getEvent().getId(), participation.getId(), participation.getRequester().getId(), participation.getStatus());
                 dtos.add(partDto);
@@ -224,7 +238,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
 
         Optional<Participation> participationInitiator = participationRepository.findFirstByEvent_Initiator_Id(userId);
-        if (participationInitiator.isPresent()) {
+        if (participationInitiator.isPresent() && participationInitiator.get().getRequester().getId() == userId) {
             throw new ConflictParamException("The initiator of the event cannot add a request to participate in his event.");
         }
 
@@ -233,12 +247,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new NotFoundException(String.format("Event with id %d not found", eventId));
         }
 
-
         User user = getUserById(userId);
         Event event = eventOpt.get();
 
         if (event.getState().equals(EventState.CANCELED) || event.getState().equals(EventState.PENDING)) {
-            throw new NotFoundException("The event has not been published yet.");
+            throw new ConflictParamException("The event has not been published yet.");
         }
 
         Participation participation = new Participation(event, user);
@@ -268,6 +281,10 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
 
         Participation participation = participationOpt.get();
+
+        if (participation.getStatus() != null && participation.getStatus().equals(ParticipantState.CONFIRMED)) {
+            throw new ConflictParamException("You cannot change participation status that is confirmed.");
+        }
 
         participation.setStatus(ParticipantState.REJECTED);
 
@@ -311,7 +328,6 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     private void patch(Event event, UpdateEventUserRequest eventDto) {
-        event.setEventDate(eventDto.getEventDate());
         if (eventDto.getAnnotation() != null) event.setAnnotation(eventDto.getAnnotation());
         if (eventDto.getCategory() != 0) event.setCategory(getCategoryById(eventDto.getCategory()));
         if (eventDto.getDescription() != null) event.setDescription(event.getDescription());
@@ -322,7 +338,6 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
         if (eventDto.getStateAction() != null && eventDto.getStateAction().equals(UserStateAction.SEND_TO_REVIEW)) event.setState(EventState.PENDING);
         if (eventDto.getStateAction() != null && eventDto.getStateAction().equals(UserStateAction.CANCEL_REVIEW)) event.setState(EventState.CANCELED);
-        if (eventDto.getParticipantLimit() != 0) event.setParticipantLimit(eventDto.getParticipantLimit());
         if (eventDto.getRequestModeration() != null) event.setRequestModeration(eventDto.getRequestModeration());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
     }
