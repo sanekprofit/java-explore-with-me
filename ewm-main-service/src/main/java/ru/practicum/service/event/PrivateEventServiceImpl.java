@@ -320,10 +320,11 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             event.setLatitude(eventDto.getLocation().getLat());
             event.setLongitude(eventDto.getLocation().getLon());
         }
-        if (eventDto.getStateAction().equals(UserStateAction.SEND_TO_REVIEW)) event.setState(EventState.PENDING);
-        if (eventDto.getStateAction().equals(UserStateAction.CANCEL_REVIEW)) event.setState(EventState.CANCELED);
+        if (eventDto.getStateAction() != null && eventDto.getStateAction().equals(UserStateAction.SEND_TO_REVIEW)) event.setState(EventState.PENDING);
+        if (eventDto.getStateAction() != null && eventDto.getStateAction().equals(UserStateAction.CANCEL_REVIEW)) event.setState(EventState.CANCELED);
         if (eventDto.getParticipantLimit() != 0) event.setParticipantLimit(eventDto.getParticipantLimit());
-        event.setRequestModeration(eventDto.isRequestModeration());
+        if (eventDto.getPaid() != null) event.setPaid(eventDto.getPaid());
+        if (eventDto.getRequestModeration() != null) event.setRequestModeration(eventDto.getRequestModeration());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
     }
 

@@ -56,7 +56,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
             return CompilationMapper.toCompilationDto(eventShort, compilation);
         }
         Compilation compilation = new Compilation(new ArrayList<>(), dto.isPinned(), dto.getTitle());
-
+        repository.save(compilation);
         return CompilationMapper.toCompilationDto(new ArrayList<>(), compilation);
     }
 
