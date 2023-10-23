@@ -237,9 +237,10 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new ConflictParamException("You cannot add a repeat request.");
         }
 
-        Optional<Participation> participationInitiator = participationRepository.findFirstByEvent_Initiator_Id(userId);
-        if (participationInitiator.isPresent() && participationInitiator.get().getRequester().getId() == userId) {
-            throw new ConflictParamException("The initiator of the event cannot add a request to participate in his event.");
+        Optional<Event> eventInitiator = repository.findFirstByIdAndInitiator_Id(eventId, userId);
+        if (eventInitiator.isPresent()) {
+            Event event = eventInitiator.get();
+            if (event.getInitiator().getId() == userId) throw new ConflictParamException("The initiator event cannot participate in his own event.");
         }
 
         Optional<Event> eventOpt = repository.findById(eventId);
@@ -256,7 +257,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Participation participation = new Participation(event, user);
 
-        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
+        if (!event.isRequestModeration()) {
             participation.setStatus(ParticipantState.CONFIRMED);
             participationRepository.save(participation);
             return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
@@ -338,7 +339,6 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         }
         if (eventDto.getStateAction() != null && eventDto.getStateAction().equals(UserStateAction.SEND_TO_REVIEW)) event.setState(EventState.PENDING);
         if (eventDto.getStateAction() != null && eventDto.getStateAction().equals(UserStateAction.CANCEL_REVIEW)) event.setState(EventState.CANCELED);
-        if (eventDto.getRequestModeration() != null) event.setRequestModeration(eventDto.getRequestModeration());
         if (eventDto.getTitle() != null) event.setTitle(eventDto.getTitle());
     }
 
