@@ -105,6 +105,7 @@ public class ErrorHandler {
                 LocalDateTime.now());
     }
 
+/*
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
@@ -115,6 +116,7 @@ public class ErrorHandler {
                 e.getMessage(),
                 LocalDateTime.now());
     }
+ */
 
     private void logError(Throwable e) {
         log.error(String.format("%s throw an exception. message: %s", e.getClass().toString(), e.getMessage()));

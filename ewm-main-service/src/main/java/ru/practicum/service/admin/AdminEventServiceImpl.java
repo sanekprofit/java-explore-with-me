@@ -50,7 +50,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size, String ip) {
         List<Event> events = storage.getEventsSearch(null, users, states, categories, null, start, end, from, size);
         for (Event event : events) {
-            statClient.saveHit(new HitDto("ewm-main-service", "events/" + event.getId(), ip, LocalDateTime.now()));
+            statClient.saveHit(new HitDto("ewm-main-service", "/events/" + event.getId(), ip, LocalDateTime.now()));
         }
         return events.stream()
                 .map(event -> EventMapper.toEventFullDto(event,
@@ -117,7 +117,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     private long getViews(Long eventId) {
-        String uri = "events/" + eventId;
+        String uri = "/events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
             viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), true);

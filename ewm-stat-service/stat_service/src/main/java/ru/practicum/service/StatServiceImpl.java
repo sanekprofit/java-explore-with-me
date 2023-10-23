@@ -4,16 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
+import ru.practicum.exceptions.BadParamException;
 import ru.practicum.mapper.StatMapper;
 import ru.practicum.model.Stat;
 import ru.practicum.repository.StatRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +35,14 @@ public class StatServiceImpl implements StatService {
         LocalDateTime start = LocalDateTime.parse(startStr, formatter);
         LocalDateTime end = LocalDateTime.parse(endStr, formatter);
 
-        if (uris == null) {
+        if (start.isAfter(end)) {
+            throw new BadParamException("Start is after end");
+        }
+
+        if (uris == null || uris.isEmpty() || uris.get(0).equals("/events")) {
             if (!unique) {
+                Set<String> ips = new HashSet<>();
+
                 List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
 
                 if (stats.isEmpty()) {
@@ -46,7 +50,8 @@ public class StatServiceImpl implements StatService {
                 }
 
                 for (Stat stat : stats) {
-                    HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), stat.getUri(), stats.size());
+                    ips.add(stat.getIp());
+                    HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), stat.getUri(), ips.size());
                     viewStats.add(viewStat);
                 }
             } else {
@@ -68,21 +73,21 @@ public class StatServiceImpl implements StatService {
         } else {
             for (String uri : uris) {
                 if (!unique) {
-                    List<Stat> stats = repository.findAllByUriEqualsIgnoreCaseAndTimestampAfterAndTimestampBefore(uri, start, end);
+                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampAfterAndTimestampBefore(uri, start, end);
 
                     if (stats.isEmpty()) {
                         return new ArrayList<>(viewStats);
                     }
 
                     for (Stat stat : stats) {
-                        HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), uri, stats.size());
+                        HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), stat.getUri(), stats.size());
                         viewStats.add(viewStat);
                     }
 
                 } else {
                     Set<String> uniqueIps = new HashSet<>();
 
-                    List<Stat> stats = repository.findAllByUriEqualsIgnoreCaseAndTimestampAfterAndTimestampBefore(uri, start, end);
+                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampAfterAndTimestampBefore(uri, start, end);
 
                     if (stats.isEmpty()) {
                         return new ArrayList<>(viewStats);
@@ -97,7 +102,8 @@ public class StatServiceImpl implements StatService {
                 }
             }
         }
-
-        return new ArrayList<>(viewStats);
+        List<HitResponseDto> viewList = new ArrayList<>(viewStats);
+        viewList.sort(Comparator.comparing(HitResponseDto::getHits).reversed());
+        return viewList;
     }
 }

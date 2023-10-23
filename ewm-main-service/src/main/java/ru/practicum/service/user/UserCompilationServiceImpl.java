@@ -88,7 +88,7 @@ public class UserCompilationServiceImpl implements UserCompilationService {
     }
 
     private long getViews(Long eventId) {
-        String uri = "events/" + eventId;
+        String uri = "/events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
             viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), false);

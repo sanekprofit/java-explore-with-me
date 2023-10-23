@@ -59,7 +59,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         List<EventShortDto> dtos = new ArrayList<>();
         for (Event event : events) {
-            statClient.saveHit(new HitDto("ewm-main-service", "events/" + event.getId(), ip, LocalDateTime.now()));
+            statClient.saveHit(new HitDto("ewm-main-service", "/events/" + event.getId(), ip, LocalDateTime.now()));
             EventShortDto dto = EventMapper.toEventShortDto(event,
                     CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
                     getConfirmedRequests(event.getId()),
@@ -93,7 +93,7 @@ public class PublicEventServiceImpl implements PublicEventService {
 
         Event event = eventOpt.get();
 
-        statClient.saveHit(new HitDto("ewm-main-service", "events/" + event.getId(), ip, LocalDateTime.now()));
+        statClient.saveHit(new HitDto("ewm-main-service", "/events/" + event.getId(), ip, LocalDateTime.now()));
 
         return EventMapper.toEventFullDto(event,
                 CategoryMapper.toCategoryDto(event.getCategory().getId(), event.getCategory().getName()),
@@ -108,7 +108,7 @@ public class PublicEventServiceImpl implements PublicEventService {
     }
 
     private Long getViews(Long eventId) {
-        String uri = "events/" + eventId;
+        String uri = "/events/" + eventId;
         List<HitResponseDto> viewsList;
         try {
             viewsList = statClient.getStats(LocalDateTime.now().minusYears(300), LocalDateTime.now().plusYears(300), List.of(uri), true);

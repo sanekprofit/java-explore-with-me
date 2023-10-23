@@ -21,7 +21,7 @@ public class StatController {
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public Stat saveRequest(@RequestBody HitDto hitDto) {
-        log.info("Получен запрос на сохранение запроса.");
+        log.info(String.format("Received POST hit request. dto: %s", hitDto));
         return statService.saveRequest(hitDto);
     }
 
@@ -30,7 +30,7 @@ public class StatController {
                                         @RequestParam(name = "end") String end,
                                         @RequestParam(name = "uris", required = false) List<String> uris,
                                         @RequestParam(name = "unique", required = false, defaultValue = "false") Boolean unique) {
-        log.info(String.format("Получен запрос на получение статистики. start: [%s] end: [%s] uris: {%s} unique: %b", start, end, uris, unique));
+        log.info(String.format("Received GET stats request. start: {%s} end: {%s} uris: %s unique: %b", start, end, uris, unique));
         return statService.getStats(start, end, uris, unique);
     }
 }
