@@ -50,7 +50,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventFullDto> getEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size, String ip) {
-        List<Event> events = storage.getAdminEventsSearch(users, states, categories, start, end, from, size);
+        List<Event> events = storage.getEventsSearch(null, users, states, categories, null, start, end, from, size);
         for (Event event : events) {
             statClient.saveHit(new HitDto("ewm-main-service", "events/" + event.getId(), ip, LocalDateTime.now()));
         }
@@ -140,6 +140,8 @@ public class AdminEventServiceImpl implements AdminEventService {
             event.setLatitude(dto.getLocation().getLat());
             event.setLongitude(dto.getLocation().getLon());
         }
+        if (dto.getPaid() != null) event.setPaid(dto.getPaid());
+        if (dto.getParticipantLimit() != 0) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getTitle() != null) event.setTitle(dto.getTitle());
     }
 }

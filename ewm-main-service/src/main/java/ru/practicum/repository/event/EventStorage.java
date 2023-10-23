@@ -26,15 +26,22 @@ public class EventStorage {
 
     private final SessionFactory sessionFactory;
 
-    public List<Event> getAdminEventsSearch(List<Integer> users, List<String> states, List<Integer> categories, String start, String end, int from, int size) {
+    public List<Event> getEventsSearch(String text, List<Integer> users, List<String> states, List<Integer> categories,
+                                       Boolean paid, String start, String end, int from, int size) {
         try {
             Session session = sessionFactory.openSession();
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Event> criteriaQuery = cb.createQuery(Event.class);
             Root<Event> root = criteriaQuery.from(Event.class);
-            criteriaQuery.select(root);
 
             List<Predicate> predicates = new LinkedList<>();
+
+            if (text != null && !text.isBlank()) {
+                predicates.add(cb.or(
+                        createSearchPredicate(cb, root, "title", text),
+                        createSearchPredicate(cb, root, "annotation", text),
+                        createSearchPredicate(cb, root, "description", text)));
+            }
 
             if (users != null) {
                 predicates.add(root.get("initiator").get("id").in(users));
@@ -48,6 +55,10 @@ public class EventStorage {
                 predicates.add(root.get("category").get("id").in(categories));
             }
 
+            if (paid != null) {
+                predicates.add(cb.equal(root.get("paid"), paid));
+            }
+
             if (start != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), parseDateTime(start)));
             }
@@ -56,57 +67,8 @@ public class EventStorage {
                 predicates.add(cb.lessThanOrEqualTo(root.get("eventDate"), parseDateTime(end)));
             }
 
-            criteriaQuery.select(root).where(cb.and(predicates.toArray(Predicate[]::new)));
-
-            Query<Event> query = session.createQuery(criteriaQuery);
-
-            query.setFirstResult(from);
-            query.setMaxResults(size);
-
-            return query.getResultList();
-        } catch (Exception e) {
-            log.error(String.format("Class %s throw an exception. message: %s", e.getClass().toString(), e.getMessage()));
-            return List.of();
-        }
-    }
-
-    public List<Event> getPublicEvents(String text,
-                                       List<Integer> categories,
-                                       Boolean paid,
-                                       String rangeStart,
-                                       String rangeEnd,
-                                       int from,
-                                       int size) {
-        try {
-            Session session = sessionFactory.openSession();
-
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<Event> criteriaQuery = cb.createQuery(Event.class);
-            Root<Event> root = criteriaQuery.from(Event.class);
-            criteriaQuery.select(root);
-
-            List<Predicate> predicates = new LinkedList<>();
-
-            if (text != null && !text.isBlank()) {
-                predicates.add(cb.or(
-                        createSearchPredicate(cb, root, "title", text),
-                        createSearchPredicate(cb, root, "annotation", text),
-                        createSearchPredicate(cb, root, "description", text)));
-            }
-
-            if (categories != null && categories.isEmpty()) {
-                predicates.add(root.get("category").get("id").in(categories));
-            }
-
-            if (rangeStart != null && rangeEnd != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), parseDateTime(rangeStart)));
-                predicates.add(cb.lessThanOrEqualTo(root.get("eventDate"), parseDateTime(rangeEnd)));
-            } else {
+            if (start == null && end == null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("eventDate"), LocalDateTime.now()));
-            }
-
-            if (paid != null) {
-                predicates.add(cb.equal(root.get("paid"), paid));
             }
 
             criteriaQuery.select(root).where(cb.and(predicates.toArray(Predicate[]::new)));

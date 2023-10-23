@@ -41,14 +41,14 @@ public class PublicEventServiceImpl implements PublicEventService {
     public List<EventShortDto> getEvents(String text,
                                          List<Integer> categories,
                                          Boolean paid,
-                                         String rangeStart,
-                                         String rangeEnd,
+                                         String start,
+                                         String end,
                                          Boolean onlyAvailable,
                                          String sort,
                                          int from,
                                          int size,
                                          String ip) {
-        List<Event> events = storage.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, from, size);
+        List<Event> events = storage.getEventsSearch(text, null, null, categories, paid, start, end, from, size);
 
         if (text != null && text.equals("0")) {
             throw new BadParamException("Incorrect type of text");

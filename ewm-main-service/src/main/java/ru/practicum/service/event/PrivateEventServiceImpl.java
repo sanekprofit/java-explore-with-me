@@ -193,8 +193,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         if (!participations.isEmpty()) {
             for (Participation participation : participations) {
+                if (participation.getStatus().equals(ParticipantState.CONFIRMED)) throw new ConflictParamException(String.format("Participation with id %d already confirmed", participation.getId()));
                 if (dto.getStatus() != null && !dto.getStatus().equals(ParticipantState.PENDING)) participation.setStatus(dto.getStatus());
-
                 participationRepository.save(participation);
 
                 List<Participation> partConf = participationRepository.findAllByStatusEqualsAndEvent_Id(ParticipantState.CONFIRMED, eventId);
@@ -257,7 +257,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         Participation participation = new Participation(event, user);
 
-        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
+        if ((!event.isRequestModeration() || event.getParticipantLimit() == 0) && getConfirmedRequests(eventId) < event.getParticipantLimit()) {
             participation.setStatus(ParticipantState.CONFIRMED);
             participationRepository.save(participation);
             return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
@@ -287,7 +287,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
             throw new ConflictParamException("You cannot change participation status that is confirmed.");
         }
 
-        participation.setStatus(ParticipantState.REJECTED);
+        participation.setStatus(ParticipantState.CANCELED);
 
         participationRepository.save(participation);
         return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),

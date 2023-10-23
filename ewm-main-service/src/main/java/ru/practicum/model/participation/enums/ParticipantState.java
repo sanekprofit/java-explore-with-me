@@ -6,5 +6,7 @@ public enum ParticipantState {
 
     REJECTED,
 
+    CANCELED,
+
     PENDING
 }
