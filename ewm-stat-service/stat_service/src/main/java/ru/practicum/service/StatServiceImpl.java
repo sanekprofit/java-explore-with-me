@@ -41,18 +41,27 @@ public class StatServiceImpl implements StatService {
 
         if (uris == null || uris.isEmpty() || uris.get(0).equals("/events")) {
             if (!unique) {
-                List<String> ips = new ArrayList<>();
-
                 List<Stat> stats = repository.findAllByTimestampBetween(start, end);
 
                 if (stats.isEmpty()) {
                     return new ArrayList<>(viewStats);
                 }
 
+                Map<String, Integer> uriViewCounts = new HashMap<>();
+
                 for (Stat stat : stats) {
-                    ips.add(stat.getIp());
-                    HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), stat.getUri(), ips.size());
-                    viewStats.add(viewStat);
+                    String uri = stat.getUri();
+                    int viewCount = uriViewCounts.getOrDefault(uri, 0) + 1;
+                    uriViewCounts.put(uri, viewCount);
+                }
+
+                int maxViewCount = Collections.max(uriViewCounts.values());
+
+                for (Map.Entry<String, Integer> entry : uriViewCounts.entrySet()) {
+                    if (entry.getValue() == maxViewCount) {
+                        HitResponseDto viewStat = StatMapper.toViewStat("ewm-main-service", entry.getKey(), maxViewCount);
+                        viewStats.add(viewStat);
+                    }
                 }
             } else {
                 Set<String> uniqueIps = new HashSet<>();
@@ -79,11 +88,22 @@ public class StatServiceImpl implements StatService {
                         return new ArrayList<>(viewStats);
                     }
 
+                    Map<String, Integer> uriViewCounts = new HashMap<>();
+
                     for (Stat stat : stats) {
-                        HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), stat.getUri(), stats.size());
-                        viewStats.add(viewStat);
+                        String uri1 = stat.getUri();
+                        int viewCount = uriViewCounts.getOrDefault(uri1, 0) + 1;
+                        uriViewCounts.put(uri1, viewCount);
                     }
 
+                    int maxViewCount = Collections.max(uriViewCounts.values());
+
+                    for (Map.Entry<String, Integer> entry : uriViewCounts.entrySet()) {
+                        if (entry.getValue() == maxViewCount) {
+                            HitResponseDto viewStat = StatMapper.toViewStat("ewm-main-service", entry.getKey(), maxViewCount);
+                            viewStats.add(viewStat);
+                        }
+                    }
                 } else {
                     Set<String> uniqueIps = new HashSet<>();
 
