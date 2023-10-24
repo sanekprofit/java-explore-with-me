@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -17,7 +16,6 @@ public class NewCompilationDto {
 
     boolean pinned;
 
-    @NotNull
     @NotBlank
     @Size(max = 50, min = 1)
     String title;

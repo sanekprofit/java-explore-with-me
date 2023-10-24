@@ -35,7 +35,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>ru.practicum.EwmMain</start-class>
+        <start-class>ru.practicum.Main</start-class>
     </properties>
 
     <build>
@@ -53,7 +53,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>ru.practicum.EwmMain</mainClass>
+                            <mainClass>ru.practicum.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

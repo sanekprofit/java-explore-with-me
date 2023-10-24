@@ -15,14 +15,12 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewEventDto {
 
-    @NotNull
     @NotBlank
     @Size(max = 2000, min = 20)
     String annotation;
 
     int category;
 
-    @NotNull
     @NotBlank
     @Size(max = 7000, min = 20)
     String description;
@@ -39,7 +37,6 @@ public class NewEventDto {
 
     boolean requestModeration = true;
 
-    @NotNull
     @NotBlank
     @Size(max = 120, min = 3)
     String title;
