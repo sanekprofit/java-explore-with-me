@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.HitDto;
 import ru.practicum.HitResponseDto;
+import ru.practicum.exceptions.BadParamException;
 import ru.practicum.mapper.StatMapper;
 import ru.practicum.model.Stat;
 import ru.practicum.repository.StatRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,32 +28,48 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public Set<HitResponseDto> getStats(String startStr, String endStr, String[] uris, Boolean unique) {
+    public List<HitResponseDto> getStats(String startStr, String endStr, List<String> uris, Boolean unique) {
 
         Set<HitResponseDto> viewStats = new HashSet<>();
 
         LocalDateTime start = LocalDateTime.parse(startStr, formatter);
         LocalDateTime end = LocalDateTime.parse(endStr, formatter);
 
-        if (uris == null) {
+        if (start.isAfter(end)) {
+            throw new BadParamException("Start is after end");
+        }
+
+        if (uris == null || uris.isEmpty() || uris.get(0).equals("/events")) {
             if (!unique) {
-                List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
+                List<Stat> stats = repository.findAllByTimestampBetween(start, end);
 
                 if (stats.isEmpty()) {
-                    return viewStats;
+                    return new ArrayList<>(viewStats);
                 }
 
+                Map<String, Integer> uriViewCounts = new HashMap<>();
+
                 for (Stat stat : stats) {
-                    HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), stat.getUri(), stats.size());
-                    viewStats.add(viewStat);
+                    String uri = stat.getUri();
+                    int viewCount = uriViewCounts.getOrDefault(uri, 0) + 1;
+                    uriViewCounts.put(uri, viewCount);
+                }
+
+                int maxViewCount = Collections.max(uriViewCounts.values());
+
+                for (Map.Entry<String, Integer> entry : uriViewCounts.entrySet()) {
+                    if (entry.getValue() == maxViewCount) {
+                        HitResponseDto viewStat = StatMapper.toViewStat("ewm-main-service", entry.getKey(), maxViewCount);
+                        viewStats.add(viewStat);
+                    }
                 }
             } else {
                 Set<String> uniqueIps = new HashSet<>();
 
-                List<Stat> stats = repository.findAllByTimestampAfterAndTimestampBefore(start, end);
+                List<Stat> stats = repository.findAllByTimestampBetween(start, end);
 
                 if (stats.isEmpty()) {
-                    return viewStats;
+                    return new ArrayList<>(viewStats);
                 }
 
                 for (Stat stat : stats) {
@@ -67,24 +82,35 @@ public class StatServiceImpl implements StatService {
         } else {
             for (String uri : uris) {
                 if (!unique) {
-                    List<Stat> stats = repository.findAllByUriEqualsIgnoreCaseAndTimestampAfterAndTimestampBefore(uri, start, end);
+                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampBetween(uri, start, end);
 
                     if (stats.isEmpty()) {
-                        return viewStats;
+                        return new ArrayList<>(viewStats);
                     }
+
+                    Map<String, Integer> uriViewCounts = new HashMap<>();
 
                     for (Stat stat : stats) {
-                        HitResponseDto viewStat = StatMapper.toViewStat(stat.getApp(), uri, stats.size());
-                        viewStats.add(viewStat);
+                        String uri1 = stat.getUri();
+                        int viewCount = uriViewCounts.getOrDefault(uri1, 0) + 1;
+                        uriViewCounts.put(uri1, viewCount);
                     }
 
+                    int maxViewCount = Collections.max(uriViewCounts.values());
+
+                    for (Map.Entry<String, Integer> entry : uriViewCounts.entrySet()) {
+                        if (entry.getValue() == maxViewCount) {
+                            HitResponseDto viewStat = StatMapper.toViewStat("ewm-main-service", entry.getKey(), maxViewCount);
+                            viewStats.add(viewStat);
+                        }
+                    }
                 } else {
                     Set<String> uniqueIps = new HashSet<>();
 
-                    List<Stat> stats = repository.findAllByUriEqualsIgnoreCaseAndTimestampAfterAndTimestampBefore(uri, start, end);
+                    List<Stat> stats = repository.findAllByUriEqualsAndTimestampBetween(uri, start, end);
 
                     if (stats.isEmpty()) {
-                        return viewStats;
+                        return new ArrayList<>(viewStats);
                     }
 
                     for (Stat stat : stats) {
@@ -96,7 +122,8 @@ public class StatServiceImpl implements StatService {
                 }
             }
         }
-
-        return viewStats;
+        List<HitResponseDto> viewList = new ArrayList<>(viewStats);
+        viewList.sort(Comparator.comparing(HitResponseDto::getHits).reversed());
+        return viewList;
     }
 }
