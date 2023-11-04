@@ -8,12 +8,12 @@ import ru.practicum.HitResponseDto;
 import ru.practicum.exceptions.BadParamException;
 import ru.practicum.exceptions.ConflictParamException;
 import ru.practicum.exceptions.NotFoundException;
-import ru.practicum.mapper.CategoryMapper;
-import ru.practicum.mapper.EventMapper;
-import ru.practicum.mapper.ParticipationMapper;
-import ru.practicum.mapper.UserMapper;
+import ru.practicum.mapper.*;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.comment.Comment;
+import ru.practicum.model.comment.dto.CommentDto;
+import ru.practicum.model.comment.dto.NewCommentDto;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.Location;
 import ru.practicum.model.event.dto.EventFullDto;
@@ -30,6 +30,7 @@ import ru.practicum.model.participation.enums.ParticipantState;
 import ru.practicum.model.user.User;
 import ru.practicum.model.user.dto.UserShortDto;
 import ru.practicum.repository.category.CategoryRepository;
+import ru.practicum.repository.event.CommentRepository;
 import ru.practicum.repository.event.EventRepository;
 import ru.practicum.repository.event.ParticipationRepository;
 import ru.practicum.repository.user.UserRepository;
@@ -48,6 +49,8 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     private final BaseClient statClient;
 
     private final UserRepository userRepository;
+
+    private final CommentRepository commentRepository;
 
     private final CategoryRepository categoryRepository;
 
@@ -304,6 +307,73 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         participationRepository.save(participation);
         return ParticipationMapper.toDto(participation.getCreated(), participation.getEvent().getId(),
                 participation.getId(), participation.getRequester().getId(), participation.getStatus());
+    }
+
+    @Override
+    public CommentDto postComment(Integer userId, Long eventId, NewCommentDto dto) {
+        Comment comment = CommentMapper.toComment(dto.getText(), LocalDateTime.now());
+
+        Optional<Event> eventOpt = repository.findById(eventId);
+        if (eventOpt.isEmpty()) {
+            throw new NotFoundException(String.format("Event with id %d not found", eventId));
+        }
+
+        Event event = eventOpt.get();
+        User user = getUserById(userId);
+
+        comment.setEvent(event);
+        comment.setUser(user);
+        commentRepository.save(comment);
+        return CommentMapper.toDto(comment.getId(), UserMapper.toUserShortDto(user.getId(), user.getName()), comment.getText(), comment.getCreated(), null);
+    }
+
+    @Override
+    public List<CommentDto> getCommentsByEventId(Integer userId, Long eventId) {
+        List<Comment> comments = commentRepository.findAllByEvent_Id(eventId);
+
+        return comments.stream()
+                .map(comment -> CommentMapper.toDto(comment.getId(),
+                        UserMapper.toUserShortDto(comment.getUser().getId(), comment.getUser().getName()),
+                        comment.getText(),
+                        comment.getCreated(),
+                        comment.getChanged()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentDto getCommentById(Integer userId, Long commentId) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (commentOpt.isEmpty()) {
+            throw new NotFoundException(String.format("Comment with id %d not found", commentId));
+        }
+
+        Comment comment = commentOpt.get();
+        User user = comment.getUser();
+
+        return CommentMapper.toDto(comment.getId(), UserMapper.toUserShortDto(user.getId(), user.getName()), comment.getText(), comment.getCreated(), comment.getChanged());
+    }
+
+    @Override
+    public CommentDto patchComment(Integer userId, Long commentId, NewCommentDto dto) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (commentOpt.isEmpty()) {
+            throw new NotFoundException(String.format("Comment with id %d not found", commentId));
+        }
+
+        Comment comment = commentOpt.get();
+
+        if (comment.getUser().getId() != userId) {
+            throw new ConflictParamException("You can't change someone else's comment");
+        }
+
+        comment.setText(dto.getText());
+        comment.setChanged(LocalDateTime.now());
+
+        commentRepository.save(comment);
+
+        User user = comment.getUser();
+
+        return CommentMapper.toDto(comment.getId(), UserMapper.toUserShortDto(user.getId(), user.getName()), comment.getText(), comment.getCreated(), LocalDateTime.now());
     }
 
     private int getConfirmedRequests(Long eventId) {

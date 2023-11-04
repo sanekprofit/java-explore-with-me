@@ -1,5 +1,7 @@
 package ru.practicum.service.event;
 
+import ru.practicum.model.comment.dto.CommentDto;
+import ru.practicum.model.comment.dto.NewCommentDto;
 import ru.practicum.model.event.dto.EventFullDto;
 import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.NewEventDto;
@@ -29,5 +31,13 @@ public interface PrivateEventService {
     ParticipationRequestDto postParticipation(Integer userId, Long eventId);
 
     ParticipationRequestDto patchParticipation(Integer userId, Integer requestId);
+
+    CommentDto postComment(Integer userId, Long eventId, NewCommentDto dto);
+
+    List<CommentDto> getCommentsByEventId(Integer userId, Long eventId);
+
+    CommentDto getCommentById(Integer userId, Long commentId);
+
+    CommentDto patchComment(Integer userId, Long commentId, NewCommentDto dto);
 
 }
