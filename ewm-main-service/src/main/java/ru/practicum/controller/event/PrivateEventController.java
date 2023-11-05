@@ -26,10 +26,6 @@ public class PrivateEventController {
 
     private final PrivateEventService service;
 
-    private static final String COMMENT = "/comments";
-
-    private static final String COMENTID = "/comments/{commentId}";
-
     @PostMapping("/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto postEvent(@PathVariable Integer userId,
@@ -97,7 +93,7 @@ public class PrivateEventController {
         return service.patchParticipation(userId, requestId);
     }
 
-    @PostMapping(COMMENT)
+    @PostMapping("/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto postComment(@PathVariable Integer userId,
                                   @RequestParam Long eventId,
@@ -106,21 +102,21 @@ public class PrivateEventController {
         return service.postComment(userId, eventId, dto);
     }
 
-    @GetMapping(COMMENT)
+    @GetMapping("/comments")
     public List<CommentDto> getCommentsByEventId(@PathVariable Integer userId,
                                         @RequestParam Long eventId) {
         log.info(String.format("Received GET comments request. user id: {%d} event id: {%d}", userId, eventId));
         return service.getCommentsByEventId(userId, eventId);
     }
 
-    @GetMapping(COMENTID)
+    @GetMapping("/comments/{commentId}")
     public CommentDto getCommentById(@PathVariable Integer userId,
                                      @PathVariable Long commentId) {
         log.info(String.format("Received GET comment request. user id: {%d} comment id : {%d}", userId, commentId));
         return service.getCommentById(userId, commentId);
     }
 
-    @PatchMapping(COMENTID)
+    @PatchMapping("/comments/{commentId}")
     public CommentDto patchComment(@PathVariable Integer userId,
                                    @PathVariable Long commentId,
                                    @Valid @RequestBody NewCommentDto dto) {
